@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter / Modifier un animal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>🐾 Ajouter / Modifier un animal</h1>
+
+<div id="formulaireContainer">
+    <h2 id="titreFormulaire">Ajouter un animal</h2>
+
+    <!-- PHOTO - Version améliorée (sans rognage) -->
+    <div class="form-bloc">
+        <label>Photo de l’animal :</label>
+        <input type="file" id="photoInput" accept="image/*">
+        <div id="photoPreviewContainer" class="cache">
+            <img id="photoPreview" class="photoCarree" alt="Aperçu de la photo">
+            <button id="btnSupprimerPhoto" class="btn-secondaire">Supprimer la photo</button>
+        </div>
+    </div>
+
+    <div class="form-bloc">
+        <label>Nom de l’animal :</label>
+        <input id="nomInput" required>
+
+        <label>Type :</label>
+        <select id="typeInput">
+            <option value="chien">Chien</option>
+            <option value="chat">Chat</option>
+        </select>
+
+        <label id="labelExterieur" class="cache">
+            <input type="checkbox" id="exterieurInput"> Accès extérieur (chat uniquement)
+        </label>
+
+        <label>Race :</label>
+        <input id="raceInput">
+
+        <label>Poids (kg) :</label>
+        <input id="poidsInput" type="number" step="0.1" placeholder="Ex: 12.5">
+
+        <label>Date de naissance :</label>
+        <input type="date" id="dateNaissanceInput">
+
+        <label>OU année seulement :</label>
+        <input id="anneeInput" placeholder="AAAA" maxlength="4">
+    </div>
+
+    <!-- Vaccins -->
+    <h3>Vaccins</h3>
+    <div id="vaccinsChien" class="form-bloc">
+        <label>CHP :</label>
+        <input type="date" id="v_chp">
+
+        <label>Pi (Parvovirose) :</label>
+        <input type="date" id="v_pi">
+
+        <label>Leptospirose :</label>
+        <input type="date" id="v_l">
+
+        <label>Rage :</label>
+        <input type="date" id="v_rage_chien">
+        <p class="info">Le vaccin de la rage est obligatoire uniquement pour les voyages à l'étranger et les chiens de catégorie 1 et 2.</p>
+
+        <label>Leishmaniose :</label>
+        <input type="date" id="v_leish">
+
+        <label>Piroplasmose :</label>
+        <input type="date" id="v_piro">
+
+        <label>Toux du chenil :</label>
+        <input type="date" id="v_toux">
+    </div>
+
+    <div id="vaccinsChat" class="form-bloc cache">
+        <label>Typhus :</label>
+        <input type="date" id="v_typhus">
+
+        <label>Coryza :</label>
+        <input type="date" id="v_coryza">
+
+        <label>Leucose :</label>
+        <input type="date" id="v_leucose">
+
+        <label>Rage :</label>
+        <input type="date" id="v_rage_chat">
+        <p class="info">Le vaccin de la rage est obligatoire uniquement pour les voyages à l'étranger.</p>
+    </div>
+
+    <!-- Soins -->
+    <h3>Soins</h3>
+    <div class="form-bloc">
+        <div id="toilettageBloc">
+            <label>Toilettage :</label>
+            <input type="date" id="s_toilettage">
+
+            <label>Fréquence (en mois) :</label>
+            <input type="number" id="freq_toilettage" min="1" max="12" value="3">
+        </div>
+
+        <label>Vermifuge :</label>
+        <input type="date" id="s_vermifuge">
+
+        <label>Anti-puces :</label>
+        <input type="date" id="s_antipuces">
+    </div>
+
+    <!-- Notes importantes -->
+    <h3>Notes importantes</h3>
+    <div class="form-bloc">
+        <label>Ajouter une nouvelle note :</label>
+        <textarea id="nouvelleNote" rows="4" placeholder="Écrire une nouvelle note..."></textarea>
+        <button id="btnAjouterNote" class="btn-secondaire">Ajouter la note</button>
+
+        <h4>Historique des notes :</h4>
+        <div id="historiqueNotes"></div>
+    </div>
+
+    <button id="btnEnregistrer" class="btn-principal">Enregistrer</button>
+    <button onclick="window.location.href='index.html'" class="btn-secondaire">Annuler et retourner</button>
+</div>
+
+<script src="ajout-script.js"></script>
+</body>
+</html>

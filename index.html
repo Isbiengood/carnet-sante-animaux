@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carnet de Santé - Animaux</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>🐾 Carnet de Santé Animaux</h1>
+
+    <!-- Bannière d'alertes -->
+    <div id="banniereAlertes" class="banniere-alertes cache">
+        <div class="banniere-content">
+            <span id="texteBanniere"></span>
+            <button id="btnVoirAlertes" class="btn-secondaire">Voir les détails</button>
+            <button id="btnFermerBanniere" class="btn-fermer">✕</button>
+        </div>
+    </div>
+
+    <div id="app">
+
+        <!-- Onglets Chien / Chat -->
+        <div class="onglets">
+            <button class="onglet actif" data-type="chien">🐶 Chiens</button>
+            <button class="onglet" data-type="chat">🐱 Chats</button>
+        </div>
+
+        <!-- Bouton Ajouter -->
+        <button id="btnAjouter" class="btn-principal" style="margin: 20px 0;">+ Ajouter un animal</button>
+
+        <!-- Liste des animaux -->
+        <ul id="listeAnimaux"></ul>
+
+        <!-- Bloc Urgences -->
+        <div id="blocUrgences">
+            <h2>⚠️ Urgences</h2>
+
+            <!-- Vétérinaire -->
+            <div class="phone-group">
+                <label>Vétérinaire :</label>
+                <div class="phone-row">
+                    <input type="text" id="urgenceVeto" placeholder="Nouveau numéro" maxlength="14">
+                    <button id="btnVeto" class="btn-secondaire">Enregistrer</button>
+                </div>
+            </div>
+
+            <!-- Toiletteur -->
+            <div class="phone-group">
+                <label>Toiletteur :</label>
+                <div class="phone-row">
+                    <input type="text" id="urgenceToiletteur" placeholder="Nouveau numéro" maxlength="14">
+                    <button id="btnToiletteur" class="btn-secondaire">Enregistrer</button>
+                </div>
+            </div>
+
+            <!-- Centres anti-poison -->
+            <label>Centres anti-poison (8h30–00h, 7j/7) :</label>
+            <div class="numeroFixe">
+                Lyon (CNITV) : <strong>04 78 87 10 40</strong><br>
+                Nantes (CAPAE-Ouest) : <strong>02 40 68 77 40</strong>
+            </div>
+        </div>
+
+        <!-- Fiche animal -->
+        <div id="ficheAnimal" class="cache"></div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
