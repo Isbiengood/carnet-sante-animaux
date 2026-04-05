@@ -21,16 +21,14 @@
 
     <div id="app">
 
-        <!-- Onglets Chien / Chat -->
+        <!-- Onglets -->
         <div class="onglets">
             <button class="onglet actif" data-type="chien">🐶 Chiens</button>
             <button class="onglet" data-type="chat">🐱 Chats</button>
         </div>
 
-        <!-- Bouton Ajouter -->
         <button id="btnAjouter" class="btn-principal" style="margin: 20px 0;">+ Ajouter un animal</button>
 
-        <!-- Liste des animaux -->
         <ul id="listeAnimaux"></ul>
 
         <!-- Bloc Urgences -->
@@ -57,11 +55,11 @@
                 <div id="affichageToiletteur" class="numero-affiche cache"></div>
             </div>
 
-            <!-- Centres anti-poison -->
+            <!-- Centres anti-poison (déjà cliquables) -->
             <label>Centres anti-poison (8h30–00h, 7j/7) :</label>
             <div class="numeroFixe">
-                Lyon (CNITV) : <strong>04 78 87 10 40</strong><br>
-                Nantes (CAPAE-Ouest) : <strong>02 40 68 77 40</strong>
+                Lyon (CNITV) : <strong><a href="tel:0478871040">04 78 87 10 40</a></strong><br>
+                Nantes (CAPAE-Ouest) : <strong><a href="tel:0240687740">02 40 68 77 40</a></strong>
             </div>
         </div>
 
