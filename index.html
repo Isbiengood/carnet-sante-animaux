@@ -41,18 +41,20 @@
             <div class="phone-group">
                 <label>Vétérinaire :</label>
                 <div class="phone-row">
-                    <input type="text" id="urgenceVeto" placeholder="Nouveau numéro" maxlength="14">
+                    <input type="tel" id="urgenceVeto" placeholder="Nouveau numéro" maxlength="14" inputmode="numeric">
                     <button id="btnVeto" class="btn-secondaire">Enregistrer</button>
                 </div>
+                <div id="affichageVeto" class="numero-affiche cache"></div>
             </div>
 
             <!-- Toiletteur -->
             <div class="phone-group">
                 <label>Toiletteur :</label>
                 <div class="phone-row">
-                    <input type="text" id="urgenceToiletteur" placeholder="Nouveau numéro" maxlength="14">
+                    <input type="tel" id="urgenceToiletteur" placeholder="Nouveau numéro" maxlength="14" inputmode="numeric">
                     <button id="btnToiletteur" class="btn-secondaire">Enregistrer</button>
                 </div>
+                <div id="affichageToiletteur" class="numero-affiche cache"></div>
             </div>
 
             <!-- Centres anti-poison -->
