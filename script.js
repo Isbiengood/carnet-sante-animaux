@@ -1,15 +1,13 @@
 // =====================================
-// CARNET DE SANTÉ ANIMAUX - SCRIPT.JS (Version finale corrigée)
-// =====================================
-
-let animaux = JSON.parse(localStorage.getItem("animaux")) || [];
-let indexEdition = null;
+// CARNET DE SANTÉ ANIMAUX - SCRIPT.JS (Version finale avec suppression notes)
+let animaux = [];
 let filtreActuel = "chien";
 
-let urgences = JSON.parse(localStorage.getItem("urgences")) || { 
-    veto: "", 
-    toiletteur: "" 
-};
+let urgences = JSON.parse(localStorage.getItem("urgences")) || { veto: "", toiletteur: "" };
+
+function chargerDonnees() {
+    animaux = JSON.parse(localStorage.getItem("animaux")) || [];
+}
 
 function sauvegarder() {
     localStorage.setItem("animaux", JSON.stringify(animaux));
@@ -35,40 +33,27 @@ function calculAge(d) {
     return new Date().getFullYear() - new Date(d).getFullYear();
 }
 
-// ==================== ANALYSE DATES ====================
 function analyser(date, freq) {
     if (!date || !freq) return null;
-
-    let today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    let base = new Date(date);
-    base.setHours(0, 0, 0, 0);
-
-    let prochaine = new Date(base);
-    const freqNum = parseInt(freq);
-
-    while (prochaine <= today) {
-        prochaine.setMonth(prochaine.getMonth() + freqNum);
-    }
-
-    let diff = Math.ceil((prochaine - today) / 86400000);
-    let retard = diff < 0 ? Math.abs(diff) : 0;
-
-    return { prochaine, diff: Math.max(0, diff), retard };
+    let today = new Date(); today.setHours(0,0,0,0);
+    let lastDone = new Date(date);
+    if (isNaN(lastDone.getTime())) return null;
+    lastDone.setHours(0,0,0,0);
+    let prochaine = new Date(lastDone);
+    prochaine.setMonth(prochaine.getMonth() + parseInt(freq));
+    let diffDays = Math.ceil((prochaine.getTime() - today.getTime()) / 86400000);
+    return {
+        prochaine,
+        diff: diffDays > 0 ? diffDays : 0,
+        retard: diffDays < 0 ? Math.abs(diffDays) : 0
+    };
 }
 
 // ==================== FRÉQUENCES ====================
 function getFrequenceVaccin(animal, vaccin) {
     let age = calculAge(animal.dateNaissance);
-    if (animal.type === "chat") {
-        if (age > 3) return vaccin === "rage" ? 36 : (animal.exterieur ? 12 : 36);
-        return 12;
-    }
-    if (animal.type === "chien") {
-        if (age > 1) return vaccin === "rage" ? 36 : 12;
-        return 12;
-    }
+    if (animal.type === "chat") return (age > 3) ? (vaccin === "rage" ? 36 : (animal.exterieur ? 12 : 36)) : 12;
+    if (animal.type === "chien") return (age > 1) ? (vaccin === "rage" ? 36 : 12) : 12;
     return 12;
 }
 
@@ -79,22 +64,13 @@ function getFrequenceSoin(animal, soin) {
     return null;
 }
 
-// ==================== FORMAT TÉLÉPHONE ====================
-function formatPhone(input) {
-    let val = input.value.replace(/\D/g, '');
-    if (val.length > 10) val = val.substring(0, 10);
-    input.value = val.replace(/(\d{2})(?=\d)/g, '$1 ');
-}
-
-// ==================== BLOC DATE POUR FICHE ====================
+// ==================== BLOC DATE ====================
 function blocDate(label, date, freq, key, index) {
     if (!date) return `<p>${label} : Non renseigné</p>`;
-
     let analyse = analyser(date, freq);
     if (!analyse) return `<p>${label} : Non renseigné</p>`;
 
     let txt = `${label} : ${formatDateFR(analyse.prochaine)}`;
-
     if (analyse.retard > 0) {
         txt = `🔴 ${txt} (en retard de ${analyse.retard} jours)
                <button onclick="majAujourdHui(${index}, '${key}')" class="btn-principal petit">Fait aujourd'hui</button>`;
@@ -108,32 +84,31 @@ function blocDate(label, date, freq, key, index) {
 
 // ==================== BANNÈRE ALERTES ====================
 function verifierAlertesProchaines() {
+    chargerDonnees();
     let alertes = [];
 
     animaux.forEach((animal, index) => {
         const estChien = animal.type === "chien";
-
         const vaccins = estChien ? [
-            { label: "CHP", key: "v_chp", freq: 12 },
-            { label: "Parvovirose (Pi)", key: "v_pi", freq: 12 },
-            { label: "Leptospirose", key: "v_l", freq: 12 },
-            { label: "Rage", key: "v_rage_chien", freq: getFrequenceVaccin(animal, "rage") },
-            { label: "Leishmaniose", key: "v_leish", freq: 12 },
-            { label: "Piroplasmose", key: "v_piro", freq: 12 },
-            { label: "Toux du chenil", key: "v_toux", freq: 12 }
+            {label:"CHP", key:"v_chp", freq:12},
+            {label:"Parvovirose (Pi)", key:"v_pi", freq:12},
+            {label:"Leptospirose", key:"v_l", freq:12},
+            {label:"Rage", key:"v_rage_chien", freq:getFrequenceVaccin(animal,"rage")},
+            {label:"Leishmaniose", key:"v_leish", freq:12},
+            {label:"Piroplasmose", key:"v_piro", freq:12},
+            {label:"Toux du chenil", key:"v_toux", freq:12}
         ] : [
-            { label: "Typhus", key: "v_typhus", freq: getFrequenceVaccin(animal, "typhus") },
-            { label: "Coryza", key: "v_coryza", freq: getFrequenceVaccin(animal, "coryza") },
-            { label: "Leucose", key: "v_leucose", freq: getFrequenceVaccin(animal, "leucose") },
-            { label: "Rage", key: "v_rage_chat", freq: getFrequenceVaccin(animal, "rage") }
+            {label:"Typhus", key:"v_typhus", freq:getFrequenceVaccin(animal,"typhus")},
+            {label:"Coryza", key:"v_coryza", freq:getFrequenceVaccin(animal,"coryza")},
+            {label:"Leucose", key:"v_leucose", freq:getFrequenceVaccin(animal,"leucose")},
+            {label:"Rage", key:"v_rage_chat", freq:getFrequenceVaccin(animal,"rage")}
         ];
 
         alertes = alertes.concat(collecterAlertesAnimal(animal, index, vaccins));
-
         alertes = alertes.concat(collecterAlertesAnimal(animal, index, [
-            { label: "Toilettage", key: "s_toilettage", freq: getFrequenceSoin(animal, "toilettage") },
-            { label: "Vermifuge", key: "s_vermifuge", freq: getFrequenceSoin(animal, "vermifuge") },
-            { label: "Anti-puces", key: "s_antipuces", freq: getFrequenceSoin(animal, "antipuces") }
+            {label:"Toilettage", key:"s_toilettage", freq:getFrequenceSoin(animal,"toilettage")},
+            {label:"Vermifuge", key:"s_vermifuge", freq:getFrequenceSoin(animal,"vermifuge")},
+            {label:"Anti-puces", key:"s_antipuces", freq:getFrequenceSoin(animal,"antipuces")}
         ]));
     });
 
@@ -145,9 +120,9 @@ function verifierAlertesProchaines() {
         return;
     }
 
-    let message = `⚠️ ${alertes.length} rappel${alertes.length > 1 ? 's' : ''} important${alertes.length > 1 ? 's' : ''} : `;
+    let message = `⚠️ ${alertes.length} rappel${alertes.length > 1 ? 's' : ''} : `;
     message += alertes.slice(0, 2).map(a => `${a.animal} (${a.label})`).join(" • ");
-    if (alertes.length > 2) message += ` + ${alertes.length - 2} autre${alertes.length - 2 > 1 ? 's' : ''}`;
+    if (alertes.length > 2) message += ` + ${alertes.length-2} autre${alertes.length-2>1?'s':''}`;
 
     document.getElementById("texteBanniere").textContent = message;
     document.getElementById("btnVoirAlertes").onclick = () => afficherDetailsAlertes(alertes);
@@ -162,21 +137,9 @@ function collecterAlertesAnimal(animal, indexAnimal, items) {
         if (!animal[item.key]) return;
         let analyse = analyser(animal[item.key], item.freq);
         if (!analyse) return;
-
         if (analyse.retard > 0 || (analyse.diff > 0 && analyse.diff <= 5)) {
-            let statut = analyse.retard > 0 
-                ? `🔴 EN RETARD (${analyse.retard}j)` 
-                : `🟡 Dans ${analyse.diff} jour${analyse.diff > 1 ? 's' : ''}`;
-
-            alertesAnimal.push({
-                animal: animal.nom,
-                type: animal.type,
-                index: indexAnimal,
-                label: item.label,
-                dateProchaine: formatDateFR(analyse.prochaine),
-                statut: statut,
-                key: item.key
-            });
+            let statut = analyse.retard > 0 ? `🔴 EN RETARD (${analyse.retard}j)` : `🟡 Dans ${analyse.diff} jour${analyse.diff>1?'s':''}`;
+            alertesAnimal.push({animal: animal.nom, index: indexAnimal, label: item.label, statut, key: item.key});
         }
     });
     return alertesAnimal;
@@ -188,13 +151,12 @@ function afficherDetailsAlertes(alertes) {
         html += `
             <div class="alerte-item">
                 <strong>${al.animal}</strong> — ${al.label}<br>
-                <small>Prochaine : ${al.dateProchaine}</small><br>
                 <span class="statut ${al.statut.includes('RETARD') ? 'retard' : 'bientot'}">${al.statut}</span>
                 <button onclick="marquerFaitDepuisBanniere(${al.index}, '${al.key}'); this.closest('.alerte-item').style.opacity='0.5'; this.disabled=true;" 
-                        class="btn-principal petit">Fait aujourd'hui</button>
+                        class="btn-principal petit">Marquer comme fait aujourd'hui</button>
             </div>`;
     });
-    html += `</div><button onclick="this.closest('.modal-alertes').remove()" class="btn-secondaire" style="margin-top:15px;">Fermer</button>`;
+    html += `</div><button onclick="this.closest('.modal-alertes').remove()" class="btn-secondaire">Fermer</button>`;
 
     let modal = document.createElement("div");
     modal.className = "modal-alertes";
@@ -203,24 +165,63 @@ function afficherDetailsAlertes(alertes) {
 }
 
 window.marquerFaitDepuisBanniere = function(index, key) {
-    animaux[index][key] = new Date().toISOString().split("T")[0];
+    let today = new Date().toISOString().split("T")[0];
+    animaux[index][key] = today;
     sauvegarder();
-    afficherListe(filtreActuel);
     verifierAlertesProchaines();
-
-    const fiche = document.getElementById("ficheAnimal");
-    if (!fiche.classList.contains("cache")) {
-        afficherFiche(animaux[index], index);
-    }
 };
 
-// ==================== LISTE & FICHE ====================
+window.majAujourdHui = function(index, key) {
+    let today = new Date().toISOString().split("T")[0];
+    animaux[index][key] = today;
+    sauvegarder();
+    verifierAlertesProchaines();
+};
+
+// ==================== GESTION NUMÉROS URGENCE ====================
+function formatPhone(input) {
+    let val = input.value.replace(/\D/g, '');
+    if (val.length > 10) val = val.substring(0, 10);
+    input.value = val.replace(/(\d{2})(?=\d)/g, '$1 ');
+}
+
+function updatePhoneUI() {
+    const vetoInput = document.getElementById("urgenceVeto");
+    const toiletteurInput = document.getElementById("urgenceToiletteur");
+    const affVeto = document.getElementById("affichageVeto");
+    const affToiletteur = document.getElementById("affichageToiletteur");
+
+    if (urgences.veto) {
+        vetoInput.value = urgences.veto;
+        formatPhone(vetoInput);
+        affVeto.textContent = urgences.veto;
+        affVeto.classList.remove("cache");
+        document.getElementById("btnVeto").textContent = "Modifier";
+    } else {
+        affVeto.classList.add("cache");
+        document.getElementById("btnVeto").textContent = "Enregistrer";
+    }
+
+    if (urgences.toiletteur) {
+        toiletteurInput.value = urgences.toiletteur;
+        formatPhone(toiletteurInput);
+        affToiletteur.textContent = urgences.toiletteur;
+        affToiletteur.classList.remove("cache");
+        document.getElementById("btnToiletteur").textContent = "Modifier";
+    } else {
+        affToiletteur.classList.add("cache");
+        document.getElementById("btnToiletteur").textContent = "Enregistrer";
+    }
+}
+
+// ==================== AFFICHAGE LISTE ====================
 function afficherListe(type) {
+    chargerDonnees();
     const listeAnimaux = document.getElementById("listeAnimaux");
+    if (!listeAnimaux) return;
     listeAnimaux.innerHTML = "";
 
     let filtres = animaux.filter(a => a.type === type);
-
     if (filtres.length === 0) {
         let li = document.createElement("li");
         li.textContent = "Aucun animal enregistré pour le moment.";
@@ -231,22 +232,28 @@ function afficherListe(type) {
     }
 
     filtres.forEach(a => {
-        let idx = animaux.findIndex(anim => anim === a);
+        let idx = animaux.findIndex(anim => anim.nom === a.nom && anim.dateNaissance === a.dateNaissance);
         let li = document.createElement("li");
         li.textContent = a.nom;
-        li.onclick = () => afficherFiche(a, idx);
+        li.onclick = () => {
+            localStorage.setItem("animalActuelIndex", idx);
+            window.location.href = "fiche.html";
+        };
         listeAnimaux.appendChild(li);
     });
 }
 
-function afficherFiche(a, index) {
-    const fiche = document.getElementById("ficheAnimal");
-    fiche.classList.remove("cache");
+// ==================== CHARGEMENT FICHE ====================
+function chargerFiche() {
+    chargerDonnees();
+    const index = parseInt(localStorage.getItem("animalActuelIndex"));
+    if (isNaN(index) || !animaux[index]) return;
 
-    // Photo entière sans rognage (version corrigée)
-    let photoHTML = a.photo ? 
-        `<img src="${a.photo}" class="photoCarree" alt="${a.nom}">` : 
-        `<div class="photoCarree" style="background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#777;padding:30px;">Pas de photo</div>`;
+    const a = animaux[index];
+    const content = document.getElementById("ficheContent");
+
+    let photoHTML = a.photo ? `<img src="${a.photo}" class="photoCarree" alt="${a.nom}">` : 
+                               `<div class="photoCarree" style="background:#ddd;display:flex;align-items:center;justify-content:center;color:#777;">Pas de photo</div>`;
 
     let html = `
         <div class="ficheHeader">
@@ -258,9 +265,9 @@ function afficherFiche(a, index) {
                 <p><strong>Poids :</strong> ${a.poids || "-"} kg</p>
                 <p><strong>${afficherNaissance(a.dateNaissance)}</strong> (${calculAge(a.dateNaissance)} ans)</p>
                 
-                <div style="margin-top: 15px;">
-                    <button class="btn-principal" onclick="modifierAnimal(${index})" style="margin-right: 8px;">Modifier</button>
-                    <button class="btn-secondaire" onclick="supprimerAnimal(${index})">Supprimer</button>
+                <div style="margin-top:25px;">
+                    <button class="btn-principal" onclick="modifierDepuisFiche(${index})" style="margin-right:12px;">Modifier</button>
+                    <button class="btn-secondaire" onclick="supprimerDepuisFiche(${index})">Supprimer</button>
                 </div>
             </div>
         </div>
@@ -291,7 +298,7 @@ function afficherFiche(a, index) {
         <h3>Notes importantes</h3>
         <div id="historiqueNotesFiche"></div>`;
 
-    fiche.innerHTML = html;
+    content.innerHTML = html;
     afficherHistoriqueNotesFiche(a.notes || []);
 }
 
@@ -305,73 +312,89 @@ function afficherHistoriqueNotesFiche(notes) {
         return;
     }
 
-    notes.forEach(n => {
+    notes.forEach((n, i) => {
         let div = document.createElement("div");
         div.className = "noteItem";
-        div.innerHTML = `<strong>${formatDateFR(n.date)}</strong> — ${n.texte}`;
+        div.innerHTML = `
+            <strong>${formatDateFR(n.date)}</strong> — ${n.texte}
+            <button onclick="supprimerNoteFiche(${i})" class="btn-supprimer-note">Supprimer</button>
+        `;
         zone.appendChild(div);
     });
 }
 
-window.majAujourdHui = function(index, key) {
-    animaux[index][key] = new Date().toISOString().split("T")[0];
-    sauvegarder();
-    afficherFiche(animaux[index], index);
-    verifierAlertesProchaines();
+window.supprimerNoteFiche = function(indexNote) {
+    const indexAnimal = parseInt(localStorage.getItem("animalActuelIndex"));
+    if (isNaN(indexAnimal) || !animaux[indexAnimal]) return;
+
+    if (confirm("Supprimer cette note définitivement ?")) {
+        animaux[indexAnimal].notes.splice(indexNote, 1);
+        sauvegarder();
+        chargerFiche();
+    }
 };
 
-// ==================== MODIFIER & SUPPRIMER ====================
-window.modifierAnimal = function(index) {
+window.modifierDepuisFiche = function(index) {
     localStorage.setItem("animalAEditer", JSON.stringify(animaux[index]));
     window.location.href = "ajout.html";
 };
 
-window.supprimerAnimal = function(index) {
+window.supprimerDepuisFiche = function(index) {
     if (!confirm("Supprimer cet animal définitivement ?")) return;
     animaux.splice(index, 1);
     sauvegarder();
-    document.getElementById("ficheAnimal").classList.add("cache");
-    afficherListe(filtreActuel);
-    verifierAlertesProchaines();
+    window.location.href = "index.html";
 };
+
+function retourAccueil() {
+    localStorage.removeItem("animalActuelIndex");
+    window.location.href = "index.html";
+}
 
 // ==================== INITIALISATION ====================
 window.onload = function () {
+    chargerDonnees();
 
-    // Téléphones urgences
+    if (document.getElementById("ficheContent")) {
+        chargerFiche();
+        return;
+    }
+
+    // Gestion numéros urgence
     const vetoInput = document.getElementById("urgenceVeto");
     const toiletteurInput = document.getElementById("urgenceToiletteur");
 
-    function updatePhoneUI() {
-        if (vetoInput) {
-            vetoInput.value = urgences.veto || "";
-            formatPhone(vetoInput);
-            document.getElementById("btnVeto").onclick = () => {
-                if (vetoInput.value.trim()) {
-                    urgences.veto = vetoInput.value;
-                    sauvegarder();
-                    updatePhoneUI();
-                }
-            };
-        }
-        if (toiletteurInput) {
-            toiletteurInput.value = urgences.toiletteur || "";
-            formatPhone(toiletteurInput);
-            document.getElementById("btnToiletteur").onclick = () => {
-                if (toiletteurInput.value.trim()) {
-                    urgences.toiletteur = toiletteurInput.value;
-                    sauvegarder();
-                    updatePhoneUI();
-                }
-            };
-        }
+    if (vetoInput) {
+        vetoInput.addEventListener("input", () => formatPhone(vetoInput));
+        document.getElementById("btnVeto").onclick = () => {
+            let val = vetoInput.value.replace(/\D/g, '');
+            if (val.length === 10) {
+                urgences.veto = val.replace(/(\d{2})(?=\d)/g, '$1 ');
+                sauvegarder();
+                updatePhoneUI();
+            } else if (val.length > 0) {
+                alert("Le numéro doit contenir exactement 10 chiffres.");
+            }
+        };
     }
 
-    if (vetoInput) vetoInput.addEventListener("input", () => formatPhone(vetoInput));
-    if (toiletteurInput) toiletteurInput.addEventListener("input", () => formatPhone(toiletteurInput));
+    if (toiletteurInput) {
+        toiletteurInput.addEventListener("input", () => formatPhone(toiletteurInput));
+        document.getElementById("btnToiletteur").onclick = () => {
+            let val = toiletteurInput.value.replace(/\D/g, '');
+            if (val.length === 10) {
+                urgences.toiletteur = val.replace(/(\d{2})(?=\d)/g, '$1 ');
+                sauvegarder();
+                updatePhoneUI();
+            } else if (val.length > 0) {
+                alert("Le numéro doit contenir exactement 10 chiffres.");
+            }
+        };
+    }
+
     updatePhoneUI();
 
-    // Gestion des onglets
+    // Onglets
     document.querySelectorAll(".onglet").forEach(btn => {
         btn.addEventListener("click", () => {
             document.querySelectorAll(".onglet").forEach(b => b.classList.remove("actif"));
@@ -381,13 +404,11 @@ window.onload = function () {
         });
     });
 
-    // Bouton Ajouter
     document.getElementById("btnAjouter").addEventListener("click", () => {
         localStorage.removeItem("animalAEditer");
         window.location.href = "ajout.html";
     });
 
-    // Lancement
     verifierAlertesProchaines();
     afficherListe(filtreActuel);
 };
