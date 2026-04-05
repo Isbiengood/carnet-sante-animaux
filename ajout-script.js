@@ -1,5 +1,5 @@
 // =====================================
-// AJOUT-SCRIPT.JS - Version complète (Ajout + Modification)
+// AJOUT-SCRIPT.JS - Version finale avec suppression de notes
 // =====================================
 
 let animaux = JSON.parse(localStorage.getItem("animaux")) || [];
@@ -44,7 +44,7 @@ document.getElementById("photoInput").onchange = function(e) {
 
 document.getElementById("btnSupprimerPhoto").onclick = cacherApercuPhoto;
 
-// ==================== NOTES ====================
+// ==================== NOTES (avec suppression) ====================
 document.getElementById("btnAjouterNote").onclick = function() {
     let texte = document.getElementById("nouvelleNote").value.trim();
     if (!texte) return;
@@ -66,20 +66,35 @@ function afficherHistoriqueNotes(notes) {
         return;
     }
 
-    notes.forEach(n => {
+    notes.forEach((n, i) => {
         let div = document.createElement("div");
         div.className = "noteItem";
-        div.innerHTML = `<strong>${formatDateFR(n.date)}</strong> — ${n.texte}`;
+        div.innerHTML = `
+            <strong>${formatDateFR(n.date)}</strong> — ${n.texte}
+            <button onclick="supprimerNote(${i})" class="btn-supprimer-note">Supprimer</button>
+        `;
         zone.appendChild(div);
     });
 }
 
+window.supprimerNote = function(index) {
+    if (confirm("Supprimer cette note ?")) {
+        notesTemporaires.splice(index, 1);
+        afficherHistoriqueNotes(notesTemporaires);
+    }
+};
+
 // ==================== CHARGEMENT MODE ÉDITION ====================
 function chargerModeEdition() {
     const animalAEditer = JSON.parse(localStorage.getItem("animalAEditer"));
-    if (!animalAEditer) return; // Mode ajout
+    if (!animalAEditer) {
+        // Mode ajout
+        document.getElementById("titreFormulaire").textContent = "Ajouter un nouvel animal";
+        document.getElementById("btnEnregistrer").textContent = "Enregistrer l'animal";
+        return;
+    }
 
-    // Recherche de l'index de l'animal à modifier
+    // Mode modification
     indexEdition = animaux.findIndex(a => 
         a.nom === animalAEditer.nom && 
         a.dateNaissance === animalAEditer.dateNaissance
@@ -93,8 +108,7 @@ function chargerModeEdition() {
 
     const a = animalAEditer;
 
-    // Changement du titre et du bouton
-    document.getElementById("titreFormulaire").textContent = "Modifier l’animal";
+    document.getElementById("titreFormulaire").textContent = `Modifier ${a.nom}`;
     document.getElementById("btnEnregistrer").textContent = "Enregistrer les modifications";
 
     // Remplissage des champs
@@ -148,13 +162,12 @@ function chargerModeEdition() {
     document.getElementById("s_vermifuge").value = a.s_vermifuge || "";
     document.getElementById("s_antipuces").value = a.s_antipuces || "";
 
-    // Mise à jour de l'affichage Chien/Chat
+    // Mise à jour affichage Chien/Chat
     document.getElementById("typeInput").dispatchEvent(new Event('change'));
 }
 
 // ==================== ENREGISTREMENT ====================
 document.getElementById("btnEnregistrer").onclick = function() {
-
     let nomInput = document.getElementById("nomInput");
     if (!nomInput || !nomInput.value.trim()) {
         alert("Le nom de l’animal est obligatoire.");
@@ -190,8 +203,7 @@ document.getElementById("btnEnregistrer").onclick = function() {
 
         // Soins
         s_toilettage: document.getElementById("s_toilettage").value,
-        freq_toilettage: document.getElementById("freq_toilettage").value ? 
-                         parseInt(document.getElementById("freq_toilettage").value) : 3,
+        freq_toilettage: parseInt(document.getElementById("freq_toilettage").value) || 3,
         s_vermifuge: document.getElementById("s_vermifuge").value,
         s_antipuces: document.getElementById("s_antipuces").value
     };
@@ -232,17 +244,17 @@ if (typeInput) {
 window.onload = function() {
     console.log("✅ ajout-script.js chargé avec succès");
 
-    // Charger le mode édition si un animal est à modifier
     chargerModeEdition();
 
     // Affichage initial selon le type
     if (typeInput) typeInput.dispatchEvent(new Event('change'));
 
-    // Bouton Annuler → nettoyage du mode édition
-    const btnAnnuler = document.querySelector("button[onclick*='index.html']");
+    // Bouton Annuler
+    const btnAnnuler = document.getElementById("btnAnnuler");
     if (btnAnnuler) {
         btnAnnuler.addEventListener("click", () => {
             localStorage.removeItem("animalAEditer");
+            window.location.href = "index.html";
         });
     }
 };
