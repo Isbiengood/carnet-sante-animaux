@@ -1,9 +1,12 @@
 // =====================================
-// CARNET DE SANTÉ ANIMAUX - SCRIPT.JS (Version finale avec suppression notes)
+// CARNET DE SANTÉ ANIMAUX - SCRIPT.JS (Version finale - Numéros cliquables)
 let animaux = [];
 let filtreActuel = "chien";
 
-let urgences = JSON.parse(localStorage.getItem("urgences")) || { veto: "", toiletteur: "" };
+let urgences = JSON.parse(localStorage.getItem("urgences")) || { 
+    veto: "", 
+    toiletteur: "" 
+};
 
 function chargerDonnees() {
     animaux = JSON.parse(localStorage.getItem("animaux")) || [];
@@ -52,8 +55,14 @@ function analyser(date, freq) {
 // ==================== FRÉQUENCES ====================
 function getFrequenceVaccin(animal, vaccin) {
     let age = calculAge(animal.dateNaissance);
-    if (animal.type === "chat") return (age > 3) ? (vaccin === "rage" ? 36 : (animal.exterieur ? 12 : 36)) : 12;
-    if (animal.type === "chien") return (age > 1) ? (vaccin === "rage" ? 36 : 12) : 12;
+    if (animal.type === "chat") {
+        if (age > 3) return vaccin === "rage" ? 36 : (animal.exterieur ? 12 : 36);
+        return 12;
+    }
+    if (animal.type === "chien") {
+        if (age > 1) return vaccin === "rage" ? 36 : 12;
+        return 12;
+    }
     return 12;
 }
 
@@ -178,7 +187,7 @@ window.majAujourdHui = function(index, key) {
     verifierAlertesProchaines();
 };
 
-// ==================== GESTION NUMÉROS URGENCE ====================
+// ==================== GESTION NUMÉROS URGENCE (CLICABLES) ====================
 function formatPhone(input) {
     let val = input.value.replace(/\D/g, '');
     if (val.length > 10) val = val.substring(0, 10);
@@ -191,10 +200,12 @@ function updatePhoneUI() {
     const affVeto = document.getElementById("affichageVeto");
     const affToiletteur = document.getElementById("affichageToiletteur");
 
+    // Vétérinaire
     if (urgences.veto) {
         vetoInput.value = urgences.veto;
         formatPhone(vetoInput);
-        affVeto.textContent = urgences.veto;
+        const numeroPropre = urgences.veto.replace(/\s/g, '');
+        affVeto.innerHTML = `<a href="tel:${numeroPropre}" style="color:#d45a80; text-decoration:none;">${urgences.veto}</a>`;
         affVeto.classList.remove("cache");
         document.getElementById("btnVeto").textContent = "Modifier";
     } else {
@@ -202,10 +213,12 @@ function updatePhoneUI() {
         document.getElementById("btnVeto").textContent = "Enregistrer";
     }
 
+    // Toiletteur
     if (urgences.toiletteur) {
         toiletteurInput.value = urgences.toiletteur;
         formatPhone(toiletteurInput);
-        affToiletteur.textContent = urgences.toiletteur;
+        const numeroPropre = urgences.toiletteur.replace(/\s/g, '');
+        affToiletteur.innerHTML = `<a href="tel:${numeroPropre}" style="color:#d45a80; text-decoration:none;">${urgences.toiletteur}</a>`;
         affToiletteur.classList.remove("cache");
         document.getElementById("btnToiletteur").textContent = "Modifier";
     } else {
@@ -247,7 +260,10 @@ function afficherListe(type) {
 function chargerFiche() {
     chargerDonnees();
     const index = parseInt(localStorage.getItem("animalActuelIndex"));
-    if (isNaN(index) || !animaux[index]) return;
+    if (isNaN(index) || !animaux[index]) {
+        document.getElementById("ficheContent").innerHTML = "<p style='color:red;text-align:center;padding:40px;'>Animal introuvable.</p>";
+        return;
+    }
 
     const a = animaux[index];
     const content = document.getElementById("ficheContent");
