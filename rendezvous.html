@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rendez-vous - Carnet de Santé</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>📅 Mes Rendez-vous</h1>
+
+    <button onclick="retourAccueil()" class="btn-secondaire" style="margin-bottom: 20px;">
+        ← Retour à l'accueil
+    </button>
+
+    <div class="form-bloc">
+        <h2>Ajouter un rendez-vous</h2>
+        
+        <label>Animal :</label>
+        <input type="text" id="rdvAnimal" placeholder="Nom de l'animal (ex: Réglisse)">
+
+        <label>Date du rendez-vous :</label>
+        <input type="date" id="rdvDate">
+
+        <label>Motif :</label>
+        <input type="text" id="rdvMotif" placeholder="Vaccin, Toilettage, Contrôle...">
+
+        <label>Lieu / Vétérinaire / Toiletteur :</label>
+        <input type="text" id="rdvLieu" placeholder="Clinique VetPlus ou Salon Poils & Griffes">
+
+        <button onclick="ajouterRendezVous()" class="btn-principal" style="margin-top: 15px;">
+            + Ajouter le rendez-vous
+        </button>
+    </div>
+
+    <h2>Rendez-vous à venir</h2>
+    <div id="listeRendezVous"></div>
+
+    <script src="rendezvous-script.js"></script>
+</body>
+</html>
