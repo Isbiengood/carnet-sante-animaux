@@ -1,5 +1,7 @@
 // =====================================
-// CARNET DE SANTÉ ANIMAUX - SCRIPT.JS (Version corrigée - Modifier + Fait aujourd'hui)
+// CARNET DE SANTÉ ANIMAUX - SCRIPT.JS (Version finale complète)
+// =====================================
+
 let animaux = [];
 let filtreActuel = "chien";
 
@@ -180,20 +182,18 @@ window.marquerFaitDepuisBanniere = function(index, key) {
     verifierAlertesProchaines();
 };
 
-// ==================== MAJ AUJOURD'HUI DANS FICHE ====================
 window.majAujourdHui = function(index, key) {
     let today = new Date().toISOString().split("T")[0];
     animaux[index][key] = today;
     sauvegarder();
     verifierAlertesProchaines();
 
-    // Recharge la fiche si on est dessus
     if (document.getElementById("ficheContent")) {
         chargerFiche();
     }
 };
 
-// ==================== GESTION NUMÉROS URGENCE ====================
+// ==================== GESTION NUMÉROS URGENCE (cliquables) ====================
 function formatPhone(input) {
     let val = input.value.replace(/\D/g, '');
     if (val.length > 10) val = val.substring(0, 10);
@@ -229,6 +229,69 @@ function updatePhoneUI() {
         affToiletteur.classList.add("cache");
         document.getElementById("btnToiletteur").textContent = "Enregistrer";
     }
+}
+
+// ==================== EXPORT / IMPORT DONNÉES ====================
+function exporterDonnees() {
+    chargerDonnees();
+    
+    const donnees = {
+        version: "1.0",
+        dateExport: new Date().toISOString(),
+        animaux: animaux,
+        urgences: urgences
+    };
+
+    const jsonString = JSON.stringify(donnees, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `carnet-sante-${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    alert("✅ Sauvegarde téléchargée avec succès !\nConservez bien ce fichier en sécurité.");
+}
+
+function importerDonnees() {
+    if (!confirm("⚠️ Attention :\nCette action va remplacer toutes vos données actuelles (animaux, photos, vaccins, notes...).\n\nVoulez-vous vraiment continuer ?")) {
+        return;
+    }
+
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+
+    input.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                const donnees = JSON.parse(event.target.result);
+
+                if (donnees.animaux) {
+                    localStorage.setItem("animaux", JSON.stringify(donnees.animaux));
+                }
+                if (donnees.urgences) {
+                    localStorage.setItem("urgences", JSON.stringify(donnees.urgences));
+                }
+
+                alert("✅ Données restaurées avec succès !");
+                window.location.reload(); // Recharge la page
+            } catch (err) {
+                alert("❌ Erreur : Le fichier n'est pas valide ou est corrompu.");
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    input.click();
 }
 
 // ==================== AFFICHAGE LISTE ====================
@@ -354,7 +417,6 @@ window.supprimerNoteFiche = function(indexNote) {
     }
 };
 
-// ==================== MODIFIER ANIMAL ====================
 window.modifierDepuisFiche = function(index) {
     if (!animaux[index]) {
         alert("Erreur : Animal introuvable.");
