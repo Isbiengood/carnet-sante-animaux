@@ -193,7 +193,7 @@ window.majAujourdHui = function(index, key) {
     }
 };
 
-// ==================== GESTION NUMÉROS URGENCE (cliquables) ====================
+// ==================== GESTION NUMÉROS URGENCE ====================
 function formatPhone(input) {
     let val = input.value.replace(/\D/g, '');
     if (val.length > 10) val = val.substring(0, 10);
@@ -258,7 +258,7 @@ function exporterDonnees() {
 }
 
 function importerDonnees() {
-    if (!confirm("⚠️ Attention :\nCette action va remplacer toutes vos données actuelles (animaux, photos, vaccins, notes...).\n\nVoulez-vous vraiment continuer ?")) {
+    if (!confirm("⚠️ Attention :\nCette action va remplacer toutes vos données actuelles.\n\nVoulez-vous vraiment continuer ?")) {
         return;
     }
 
@@ -283,14 +283,13 @@ function importerDonnees() {
                 }
 
                 alert("✅ Données restaurées avec succès !");
-                window.location.reload(); // Recharge la page
+                window.location.reload();
             } catch (err) {
                 alert("❌ Erreur : Le fichier n'est pas valide ou est corrompu.");
             }
         };
         reader.readAsText(file);
     };
-
     input.click();
 }
 
@@ -486,8 +485,15 @@ window.onload = function () {
         btn.addEventListener("click", () => {
             document.querySelectorAll(".onglet").forEach(b => b.classList.remove("actif"));
             btn.classList.add("actif");
-            filtreActuel = btn.dataset.type;
-            afficherListe(filtreActuel);
+
+            const type = btn.dataset.type;
+
+            if (type === "rendezvous") {
+                window.location.href = "rendezvous.html";
+            } else {
+                filtreActuel = type;
+                afficherListe(filtreActuel);
+            }
         });
     });
 
