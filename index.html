@@ -34,23 +34,31 @@
         <!-- Liste des animaux -->
         <ul id="listeAnimaux"></ul>
 
-        <!-- Bloc Sauvegarde -->
+        <!-- Bloc Sauvegarde & Synchronisation -->
         <div class="bloc-sauvegarde">
-            <h2>💾 Sauvegarde de vos données</h2>
-            <p style="margin-bottom: 15px;">
-                Pour ne jamais perdre les informations de vos animaux, pensez à sauvegarder régulièrement.
-            </p>
+            <h2>💾 Sauvegarde & Synchronisation</h2>
+            <p>Pour partager les données entre ton téléphone, ton ordinateur et celui de ta femme :</p>
+            
             <div class="sauvegarde-boutons">
-                <button onclick="exporterDonnees()" class="btn-principal">💾 Sauvegarder mes données</button>
-                <button onclick="importerDonnees()" class="btn-secondaire">📂 Restaurer une sauvegarde</button>
+                <button onclick="exporterDonnees()" class="btn-principal">
+                    💾 Exporter les données (Sauvegarde)
+                </button>
+                <button onclick="importerDonnees()" class="btn-secondaire">
+                    📂 Importer une sauvegarde
+                </button>
             </div>
-            <small>Le fichier contient tous vos animaux, photos, vaccins, soins et notes.</small>
+            
+            <small style="display:block; margin-top:12px; color:#555;">
+                • Exporte un fichier que tu peux copier sur ton téléphone ou envoyer par WhatsApp/Email.<br>
+                • Chaque personne peut importer le même fichier pour avoir les mêmes données.
+            </small>
         </div>
 
         <!-- Bloc Urgences -->
         <div id="blocUrgences">
             <h2>⚠️ Urgences</h2>
 
+            <!-- Vétérinaire -->
             <div class="phone-group">
                 <label>Vétérinaire :</label>
                 <div class="phone-row">
@@ -60,6 +68,7 @@
                 <div id="affichageVeto" class="numero-affiche cache"></div>
             </div>
 
+            <!-- Toiletteur -->
             <div class="phone-group">
                 <label>Toiletteur :</label>
                 <div class="phone-row">
@@ -69,6 +78,7 @@
                 <div id="affichageToiletteur" class="numero-affiche cache"></div>
             </div>
 
+            <!-- Centres anti-poison -->
             <label>Centres anti-poison (8h30–00h, 7j/7) :</label>
             <div class="numeroFixe">
                 Lyon (CNITV) : <strong><a href="tel:0478871040">04 78 87 10 40</a></strong><br>
