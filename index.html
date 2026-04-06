@@ -34,6 +34,19 @@
         <!-- Liste des animaux -->
         <ul id="listeAnimaux"></ul>
 
+        <!-- Bloc Sauvegarde -->
+        <div class="bloc-sauvegarde">
+            <h2>💾 Sauvegarde de vos données</h2>
+            <p style="margin-bottom: 15px;">
+                Pour ne jamais perdre les informations de vos animaux, pensez à sauvegarder régulièrement.
+            </p>
+            <div class="sauvegarde-boutons">
+                <button onclick="exporterDonnees()" class="btn-principal">💾 Sauvegarder mes données</button>
+                <button onclick="importerDonnees()" class="btn-secondaire">📂 Restaurer une sauvegarde</button>
+            </div>
+            <small>Le fichier contient tous vos animaux, photos, vaccins, soins et notes.</small>
+        </div>
+
         <!-- Bloc Urgences -->
         <div id="blocUrgences">
             <h2>⚠️ Urgences</h2>
