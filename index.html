@@ -21,15 +21,34 @@
 
     <div id="app">
 
-        <!-- Onglets -->
+        <!-- Onglets Chien / Chat -->
         <div class="onglets">
             <button class="onglet actif" data-type="chien">🐶 Chiens</button>
             <button class="onglet" data-type="chat">🐱 Chats</button>
         </div>
 
+        <!-- Bouton Ajouter -->
         <button id="btnAjouter" class="btn-principal" style="margin: 20px 0;">+ Ajouter un animal</button>
 
+        <!-- Liste des animaux -->
         <ul id="listeAnimaux"></ul>
+
+        <!-- Bloc Sauvegarde des données -->
+        <div class="bloc-sauvegarde">
+            <h2>💾 Sauvegarde de vos données</h2>
+            <p>Pour ne jamais perdre les informations de vos animaux, pensez à sauvegarder régulièrement.</p>
+            
+            <div class="sauvegarde-boutons">
+                <button onclick="exporterDonnees()" class="btn-principal">
+                    💾 Sauvegarder mes données
+                </button>
+                <button onclick="importerDonnees()" class="btn-secondaire">
+                    📂 Restaurer une sauvegarde
+                </button>
+            </div>
+            
+            <small>Le fichier contient tous vos animaux, photos, vaccins, soins et notes.</small>
+        </div>
 
         <!-- Bloc Urgences -->
         <div id="blocUrgences">
@@ -55,7 +74,7 @@
                 <div id="affichageToiletteur" class="numero-affiche cache"></div>
             </div>
 
-            <!-- Centres anti-poison (déjà cliquables) -->
+            <!-- Centres anti-poison -->
             <label>Centres anti-poison (8h30–00h, 7j/7) :</label>
             <div class="numeroFixe">
                 Lyon (CNITV) : <strong><a href="tel:0478871040">04 78 87 10 40</a></strong><br>
