@@ -36,7 +36,7 @@ h3 {
     margin: 25px 0 15px 0;
 }
 
-/* ====================== BANNER ALERTES ====================== */
+/* Bannière Alertes */
 .banniere-alertes {
     background: linear-gradient(135deg, #fff3e0, #ffe0b2);
     border: 3px solid #f57c00;
@@ -79,7 +79,7 @@ h3 {
     transform: scale(1.2);
 }
 
-/* ====================== ONGLET ====================== */
+/* Onglets */
 .onglets {
     display: flex;
     gap: 10px;
@@ -102,7 +102,7 @@ h3 {
     color: white;
 }
 
-/* ====================== LISTE ANIMAUX ====================== */
+/* Liste animaux */
 #listeAnimaux {
     list-style: none;
 }
@@ -122,7 +122,7 @@ h3 {
     transform: translateX(8px);
 }
 
-/* ====================== PHOTO ====================== */
+/* Photo */
 .photoCarree {
     width: 100%;
     max-width: 240px;
@@ -149,7 +149,7 @@ h3 {
     }
 }
 
-/* ====================== URGENCES ====================== */
+/* Urgences */
 .phone-group {
     margin-bottom: 28px;
 }
@@ -213,7 +213,7 @@ h3 {
     color: #d45a80;
 }
 
-/* ====================== NOTES ====================== */
+/* Notes */
 .noteItem {
     background: #fff9fb;
     padding: 14px 18px;
@@ -240,7 +240,7 @@ h3 {
     background: #c0392b;
 }
 
-/* ====================== RENDEZ-VOUS ====================== */
+/* Rendez-vous */
 .rdv-item {
     background: white;
     padding: 16px;
@@ -250,10 +250,10 @@ h3 {
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-/* ====================== BLOC SAUVEGARDE ====================== */
+/* Bloc Sauvegarde */
 .bloc-sauvegarde {
     background: #f0f8ff;
-    padding: 20px;
+    padding: 22px;
     border-radius: 15px;
     margin: 30px 0;
     border: 2px solid #a0d2ff;
@@ -266,7 +266,7 @@ h3 {
     margin: 15px 0;
 }
 
-/* ====================== BOUTONS ====================== */
+/* Boutons */
 .btn-principal {
     background: #d45a80;
     color: white;
@@ -275,7 +275,6 @@ h3 {
     border-radius: 10px;
     cursor: pointer;
     font-weight: bold;
-    font-size: 1.05em;
 }
 
 .btn-secondaire {
@@ -285,14 +284,13 @@ h3 {
     padding: 13px 24px;
     border-radius: 10px;
     cursor: pointer;
-    font-size: 1.05em;
 }
 
 .btn-principal:hover, .btn-secondaire:hover {
     opacity: 0.9;
 }
 
-/* ====================== CACHE & MODALE ====================== */
+/* Cache & Modale */
 .cache {
     display: none !important;
 }
@@ -318,7 +316,7 @@ h3 {
     box-shadow: 0 15px 40px rgba(0,0,0,0.4);
 }
 
-/* ====================== RESPONSIVE ====================== */
+/* Responsive */
 @media (max-width: 650px) {
     .phone-row {
         flex-direction: column;
