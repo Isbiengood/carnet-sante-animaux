@@ -21,40 +21,23 @@
 
     <div id="app">
 
-        <!-- Onglets Chien / Chat -->
+        <!-- Onglets -->
         <div class="onglets">
             <button class="onglet actif" data-type="chien">🐶 Chiens</button>
             <button class="onglet" data-type="chat">🐱 Chats</button>
+            <button class="onglet" data-type="rendezvous">📅 Rendez-vous</button>
         </div>
 
-        <!-- Bouton Ajouter -->
+        <!-- Bouton Ajouter Animal -->
         <button id="btnAjouter" class="btn-principal" style="margin: 20px 0;">+ Ajouter un animal</button>
 
         <!-- Liste des animaux -->
         <ul id="listeAnimaux"></ul>
 
-        <!-- Bloc Sauvegarde des données -->
-        <div class="bloc-sauvegarde">
-            <h2>💾 Sauvegarde de vos données</h2>
-            <p>Pour ne jamais perdre les informations de vos animaux, pensez à sauvegarder régulièrement.</p>
-            
-            <div class="sauvegarde-boutons">
-                <button onclick="exporterDonnees()" class="btn-principal">
-                    💾 Sauvegarder mes données
-                </button>
-                <button onclick="importerDonnees()" class="btn-secondaire">
-                    📂 Restaurer une sauvegarde
-                </button>
-            </div>
-            
-            <small>Le fichier contient tous vos animaux, photos, vaccins, soins et notes.</small>
-        </div>
-
         <!-- Bloc Urgences -->
         <div id="blocUrgences">
             <h2>⚠️ Urgences</h2>
 
-            <!-- Vétérinaire -->
             <div class="phone-group">
                 <label>Vétérinaire :</label>
                 <div class="phone-row">
@@ -64,7 +47,6 @@
                 <div id="affichageVeto" class="numero-affiche cache"></div>
             </div>
 
-            <!-- Toiletteur -->
             <div class="phone-group">
                 <label>Toiletteur :</label>
                 <div class="phone-row">
@@ -74,7 +56,6 @@
                 <div id="affichageToiletteur" class="numero-affiche cache"></div>
             </div>
 
-            <!-- Centres anti-poison -->
             <label>Centres anti-poison (8h30–00h, 7j/7) :</label>
             <div class="numeroFixe">
                 Lyon (CNITV) : <strong><a href="tel:0478871040">04 78 87 10 40</a></strong><br>
