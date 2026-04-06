@@ -1,20 +1,23 @@
 // =====================================
-// AJOUT-SCRIPT.JS - Version finale avec compression photo + suppression notes
-// =====================================
-
+// AJOUT-SCRIPT.JS - Version renforcée (Compression photo + sécurité)
 let animaux = JSON.parse(localStorage.getItem("animaux")) || [];
 let photoBase64 = "";
 let notesTemporaires = [];
 let indexEdition = null;
 
-// Sauvegarde
+// Sauvegarde sécurisée
 function sauvegarder() {
-    localStorage.setItem("animaux", JSON.stringify(animaux));
+    try {
+        localStorage.setItem("animaux", JSON.stringify(animaux));
+    } catch (e) {
+        alert("Erreur : Mémoire insuffisante. La photo est peut-être trop lourde.\nEssayez avec une photo plus petite.");
+        console.error("LocalStorage error:", e);
+    }
 }
 
-// ==================== COMPRESSION PHOTO ====================
+// ==================== COMPRESSION PHOTO (plus forte) ====================
 async function compresserPhoto(file) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = function(event) {
             const img = new Image();
@@ -23,13 +26,13 @@ async function compresserPhoto(file) {
                 let width = img.width;
                 let height = img.height;
 
-                // Redimensionner si trop grand (max 800px de largeur/hauteur)
-                const maxSize = 800;
+                // Taille maximale encore plus réduite
+                const maxSize = 600;
                 if (width > height && width > maxSize) {
-                    height = (height * maxSize) / width;
+                    height = Math.round((height * maxSize) / width);
                     width = maxSize;
                 } else if (height > maxSize) {
-                    width = (width * maxSize) / height;
+                    width = Math.round((width * maxSize) / height);
                     height = maxSize;
                 }
 
@@ -39,12 +42,14 @@ async function compresserPhoto(file) {
                 const ctx = canvas.getContext("2d");
                 ctx.drawImage(img, 0, 0, width, height);
 
-                // Qualité 0.75 = bon compromis taille/qualité
-                const compressedBase64 = canvas.toDataURL("image/jpeg", 0.75);
-                resolve(compressedBase64);
+                // Qualité réduite à 0.65 pour plus de sécurité
+                const compressed = canvas.toDataURL("image/jpeg", 0.65);
+                resolve(compressed);
             };
+            img.onerror = () => reject("Erreur de chargement de l'image");
             img.src = event.target.result;
         };
+        reader.onerror = () => reject("Erreur de lecture du fichier");
         reader.readAsDataURL(file);
     });
 }
@@ -62,29 +67,38 @@ document.getElementById("photoInput").onchange = async function(e) {
     let fichier = e.target.files[0];
     if (!fichier) return;
 
-    // Compression automatique
+    // Vérification taille fichier brut
+    if (fichier.size > 10 * 1024 * 1024) { // 10 Mo
+        alert("La photo est trop lourde (max 10 Mo). Veuillez en choisir une plus petite.");
+        return;
+    }
+
     try {
+        document.getElementById("photoPreview").src = ""; // reset
         photoBase64 = await compresserPhoto(fichier);
+
         const preview = document.getElementById("photoPreview");
         const container = document.getElementById("photoPreviewContainer");
         if (preview) preview.src = photoBase64;
         if (container) container.classList.remove("cache");
+
+        console.log("Photo compressée avec succès - taille :", Math.round(photoBase64.length / 1024) + " Ko");
     } catch (err) {
-        alert("Erreur lors du traitement de la photo.");
+        alert("Impossible de traiter la photo. Veuillez réessayer avec une autre photo.");
         console.error(err);
+        cacherApercuPhoto();
     }
 };
 
 document.getElementById("btnSupprimerPhoto").onclick = cacherApercuPhoto;
 
-// ==================== NOTES (avec suppression) ====================
+// ==================== NOTES ====================
 document.getElementById("btnAjouterNote").onclick = function() {
     let texte = document.getElementById("nouvelleNote").value.trim();
     if (!texte) return;
 
     let date = new Date().toISOString().split("T")[0];
     notesTemporaires.push({ date, texte });
-
     afficherHistoriqueNotes(notesTemporaires);
     document.getElementById("nouvelleNote").value = "";
 };
@@ -127,8 +141,7 @@ function chargerModeEdition() {
     }
 
     indexEdition = animaux.findIndex(a => 
-        a.nom === animalAEditer.nom && 
-        a.dateNaissance === animalAEditer.dateNaissance
+        a.nom === animalAEditer.nom && a.dateNaissance === animalAEditer.dateNaissance
     );
 
     if (indexEdition === -1) {
