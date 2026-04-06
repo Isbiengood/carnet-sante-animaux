@@ -1,5 +1,5 @@
 // =====================================
-// CARNET DE SANTÉ ANIMAUX - SCRIPT.JS (Version finale - Numéros cliquables)
+// CARNET DE SANTÉ ANIMAUX - SCRIPT.JS (Version corrigée - Modifier + Fait aujourd'hui)
 let animaux = [];
 let filtreActuel = "chien";
 
@@ -180,14 +180,20 @@ window.marquerFaitDepuisBanniere = function(index, key) {
     verifierAlertesProchaines();
 };
 
+// ==================== MAJ AUJOURD'HUI DANS FICHE ====================
 window.majAujourdHui = function(index, key) {
     let today = new Date().toISOString().split("T")[0];
     animaux[index][key] = today;
     sauvegarder();
     verifierAlertesProchaines();
+
+    // Recharge la fiche si on est dessus
+    if (document.getElementById("ficheContent")) {
+        chargerFiche();
+    }
 };
 
-// ==================== GESTION NUMÉROS URGENCE (CLICABLES) ====================
+// ==================== GESTION NUMÉROS URGENCE ====================
 function formatPhone(input) {
     let val = input.value.replace(/\D/g, '');
     if (val.length > 10) val = val.substring(0, 10);
@@ -200,7 +206,6 @@ function updatePhoneUI() {
     const affVeto = document.getElementById("affichageVeto");
     const affToiletteur = document.getElementById("affichageToiletteur");
 
-    // Vétérinaire
     if (urgences.veto) {
         vetoInput.value = urgences.veto;
         formatPhone(vetoInput);
@@ -213,7 +218,6 @@ function updatePhoneUI() {
         document.getElementById("btnVeto").textContent = "Enregistrer";
     }
 
-    // Toiletteur
     if (urgences.toiletteur) {
         toiletteurInput.value = urgences.toiletteur;
         formatPhone(toiletteurInput);
@@ -350,7 +354,12 @@ window.supprimerNoteFiche = function(indexNote) {
     }
 };
 
+// ==================== MODIFIER ANIMAL ====================
 window.modifierDepuisFiche = function(index) {
+    if (!animaux[index]) {
+        alert("Erreur : Animal introuvable.");
+        return;
+    }
     localStorage.setItem("animalAEditer", JSON.stringify(animaux[index]));
     window.location.href = "ajout.html";
 };
