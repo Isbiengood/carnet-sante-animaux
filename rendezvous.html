@@ -20,11 +20,14 @@
         <label>Animal :</label>
         <input type="text" id="rdvAnimal" placeholder="Nom de l'animal (ex: Réglisse)">
 
-        <label>Date du rendez-vous :</label>
-        <input type="date" id="rdvDate">
+        <label>Date et heure du rendez-vous :</label>
+        <div style="display: flex; gap: 10px;">
+            <input type="date" id="rdvDate" style="flex: 1;">
+            <input type="time" id="rdvHeure" style="flex: 1;">
+        </div>
 
         <label>Motif :</label>
-        <input type="text" id="rdvMotif" placeholder="Vaccin, Toilettage, Contrôle...">
+        <input type="text" id="rdvMotif" placeholder="Vaccin annuel, Toilettage, Contrôle...">
 
         <label>Lieu / Vétérinaire / Toiletteur :</label>
         <input type="text" id="rdvLieu" placeholder="Clinique VetPlus ou Salon Poils & Griffes">
