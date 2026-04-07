@@ -8,12 +8,12 @@
 </head>
 <body>
 
-<h1>🐾 Ajouter / Modifier un animal</h1>
+<h1>🐾 Carnet de Santé Animaux</h1>
 
 <div id="formulaireContainer">
-    <h2 id="titreFormulaire">Ajouter un animal</h2>
+    <h2 id="titreFormulaire">Ajouter un nouvel animal</h2>
 
-    <!-- PHOTO - Version améliorée (sans rognage) -->
+    <!-- PHOTO -->
     <div class="form-bloc">
         <label>Photo de l’animal :</label>
         <input type="file" id="photoInput" accept="image/*">
@@ -24,13 +24,13 @@
     </div>
 
     <div class="form-bloc">
-        <label>Nom de l’animal :</label>
+        <label>Nom de l’animal * :</label>
         <input id="nomInput" required>
 
         <label>Type :</label>
         <select id="typeInput">
-            <option value="chien">Chien</option>
-            <option value="chat">Chat</option>
+            <option value="chien">🐶 Chien</option>
+            <option value="chat">🐱 Chat</option>
         </select>
 
         <label id="labelExterieur" class="cache">
@@ -43,11 +43,15 @@
         <label>Poids (kg) :</label>
         <input id="poidsInput" type="number" step="0.1" placeholder="Ex: 12.5">
 
+        <!-- Nouveau champ : Identifiant officiel -->
+        <label>Identifiant officiel (puce électronique ou tatouage) :</label>
+        <input id="identifiantInput" placeholder="Ex: 250123456789012 ou tatouage AB123">
+
         <label>Date de naissance :</label>
         <input type="date" id="dateNaissanceInput">
 
         <label>OU année seulement :</label>
-        <input id="anneeInput" placeholder="AAAA" maxlength="4">
+        <input id="anneeInput" placeholder="AAAA" maxlength="4" type="number">
     </div>
 
     <!-- Vaccins -->
@@ -56,7 +60,7 @@
         <label>CHP :</label>
         <input type="date" id="v_chp">
 
-        <label>Pi (Parvovirose) :</label>
+        <label>Parvovirose (Pi) :</label>
         <input type="date" id="v_pi">
 
         <label>Leptospirose :</label>
@@ -64,7 +68,7 @@
 
         <label>Rage :</label>
         <input type="date" id="v_rage_chien">
-        <p class="info">Le vaccin de la rage est obligatoire uniquement pour les voyages à l'étranger et les chiens de catégorie 1 et 2.</p>
+        <p class="info">Obligatoire pour voyages à l'étranger et chiens de catégorie 1/2.</p>
 
         <label>Leishmaniose :</label>
         <input type="date" id="v_leish">
@@ -88,7 +92,7 @@
 
         <label>Rage :</label>
         <input type="date" id="v_rage_chat">
-        <p class="info">Le vaccin de la rage est obligatoire uniquement pour les voyages à l'étranger.</p>
+        <p class="info">Obligatoire uniquement pour voyages à l'étranger.</p>
     </div>
 
     <!-- Soins -->
@@ -113,15 +117,17 @@
     <h3>Notes importantes</h3>
     <div class="form-bloc">
         <label>Ajouter une nouvelle note :</label>
-        <textarea id="nouvelleNote" rows="4" placeholder="Écrire une nouvelle note..."></textarea>
+        <textarea id="nouvelleNote" rows="3" placeholder="Écrire une note..."></textarea>
         <button id="btnAjouterNote" class="btn-secondaire">Ajouter la note</button>
 
         <h4>Historique des notes :</h4>
         <div id="historiqueNotes"></div>
     </div>
 
-    <button id="btnEnregistrer" class="btn-principal">Enregistrer</button>
-    <button onclick="window.location.href='index.html'" class="btn-secondaire">Annuler et retourner</button>
+    <div style="margin-top: 30px;">
+        <button id="btnEnregistrer" class="btn-principal">Enregistrer</button>
+        <button id="btnAnnuler" class="btn-secondaire">Annuler et retourner</button>
+    </div>
 </div>
 
 <script src="ajout-script.js"></script>
