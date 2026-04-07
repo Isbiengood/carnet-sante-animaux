@@ -1,7 +1,5 @@
 // =====================================
-// CARNET DE SANTÉ ANIMAUX - SCRIPT.JS (Version finale complète)
-// =====================================
-
+// CARNET DE SANTÉ ANIMAUX - SCRIPT.JS (Version finale avec Identifiant animal)
 let animaux = [];
 let filtreActuel = "chien";
 
@@ -322,7 +320,7 @@ function afficherListe(type) {
     });
 }
 
-// ==================== CHARGEMENT FICHE ====================
+// ==================== CHARGEMENT FICHE (avec identifiant animal) ====================
 function chargerFiche() {
     chargerDonnees();
     const index = parseInt(localStorage.getItem("animalActuelIndex"));
@@ -346,6 +344,11 @@ function chargerFiche() {
                 <p><strong>Race :</strong> ${a.race || "-"}</p>
                 <p><strong>Poids :</strong> ${a.poids || "-"} kg</p>
                 <p><strong>${afficherNaissance(a.dateNaissance)}</strong> (${calculAge(a.dateNaissance)} ans)</p>
+                
+                <!-- Nouvel identifiant animal -->
+                <p><strong>Identifiant officiel (puce/tatouage) :</strong> 
+                    ${a.identifiant ? `<span style="color:#27ae60; font-weight:bold;">${a.identifiant}</span>` : "Non renseigné"}
+                </p>
                 
                 <div style="margin-top:25px;">
                     <button class="btn-principal" onclick="modifierDepuisFiche(${index})" style="margin-right:12px;">Modifier</button>
