@@ -1,21 +1,24 @@
 // =====================================
-// AJOUT-SCRIPT.JS - Version renforcée (Compression photo + sécurité)
+// AJOUT-SCRIPT.JS - Version finale avec Identifiant animal + suppression notes
+// =====================================
+
 let animaux = JSON.parse(localStorage.getItem("animaux")) || [];
 let photoBase64 = "";
 let notesTemporaires = [];
 let indexEdition = null;
 
-// Sauvegarde sécurisée
+// Sauvegarde
 function sauvegarder() {
-    try {
-        localStorage.setItem("animaux", JSON.stringify(animaux));
-    } catch (e) {
-        alert("Erreur : Mémoire insuffisante. La photo est peut-être trop lourde.\nEssayez avec une photo plus petite.");
-        console.error("LocalStorage error:", e);
-    }
+    localStorage.setItem("animaux", JSON.stringify(animaux));
 }
 
-// ==================== COMPRESSION PHOTO (plus forte) ====================
+// ==================== OUTILS DATES ====================
+function formatDateFR(d) {
+    if (!d) return "Non renseigné";
+    return new Date(d).toLocaleDateString("fr-FR");
+}
+
+// ==================== COMPRESSION PHOTO (pour éviter les blocages) ====================
 async function compresserPhoto(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -26,7 +29,6 @@ async function compresserPhoto(file) {
                 let width = img.width;
                 let height = img.height;
 
-                // Taille maximale encore plus réduite
                 const maxSize = 600;
                 if (width > height && width > maxSize) {
                     height = Math.round((height * maxSize) / width);
@@ -38,18 +40,16 @@ async function compresserPhoto(file) {
 
                 canvas.width = width;
                 canvas.height = height;
-
                 const ctx = canvas.getContext("2d");
                 ctx.drawImage(img, 0, 0, width, height);
 
-                // Qualité réduite à 0.65 pour plus de sécurité
                 const compressed = canvas.toDataURL("image/jpeg", 0.65);
                 resolve(compressed);
             };
-            img.onerror = () => reject("Erreur de chargement de l'image");
+            img.onerror = () => reject("Erreur image");
             img.src = event.target.result;
         };
-        reader.onerror = () => reject("Erreur de lecture du fichier");
+        reader.onerror = () => reject("Erreur lecture");
         reader.readAsDataURL(file);
     });
 }
@@ -67,38 +67,28 @@ document.getElementById("photoInput").onchange = async function(e) {
     let fichier = e.target.files[0];
     if (!fichier) return;
 
-    // Vérification taille fichier brut
-    if (fichier.size > 10 * 1024 * 1024) { // 10 Mo
-        alert("La photo est trop lourde (max 10 Mo). Veuillez en choisir une plus petite.");
-        return;
-    }
-
     try {
-        document.getElementById("photoPreview").src = ""; // reset
         photoBase64 = await compresserPhoto(fichier);
-
         const preview = document.getElementById("photoPreview");
         const container = document.getElementById("photoPreviewContainer");
         if (preview) preview.src = photoBase64;
         if (container) container.classList.remove("cache");
-
-        console.log("Photo compressée avec succès - taille :", Math.round(photoBase64.length / 1024) + " Ko");
     } catch (err) {
-        alert("Impossible de traiter la photo. Veuillez réessayer avec une autre photo.");
+        alert("Erreur lors du traitement de la photo.");
         console.error(err);
-        cacherApercuPhoto();
     }
 };
 
 document.getElementById("btnSupprimerPhoto").onclick = cacherApercuPhoto;
 
-// ==================== NOTES ====================
+// ==================== NOTES (avec suppression) ====================
 document.getElementById("btnAjouterNote").onclick = function() {
     let texte = document.getElementById("nouvelleNote").value.trim();
     if (!texte) return;
 
     let date = new Date().toISOString().split("T")[0];
     notesTemporaires.push({ date, texte });
+
     afficherHistoriqueNotes(notesTemporaires);
     document.getElementById("nouvelleNote").value = "";
 };
@@ -141,7 +131,8 @@ function chargerModeEdition() {
     }
 
     indexEdition = animaux.findIndex(a => 
-        a.nom === animalAEditer.nom && a.dateNaissance === animalAEditer.dateNaissance
+        a.nom === animalAEditer.nom && 
+        a.dateNaissance === animalAEditer.dateNaissance
     );
 
     if (indexEdition === -1) {
@@ -159,6 +150,7 @@ function chargerModeEdition() {
     document.getElementById("typeInput").value = a.type || "chien";
     document.getElementById("raceInput").value = a.race || "";
     document.getElementById("poidsInput").value = a.poids || "";
+    document.getElementById("identifiantInput").value = a.identifiant || "";
 
     if (a.dateNaissance && a.dateNaissance.endsWith("-01-01")) {
         document.getElementById("anneeInput").value = a.dateNaissance.substring(0, 4);
@@ -181,7 +173,7 @@ function chargerModeEdition() {
     notesTemporaires = a.notes ? [...a.notes] : [];
     afficherHistoriqueNotes(notesTemporaires);
 
-    // Vaccins et Soins
+    // Vaccins Chien
     document.getElementById("v_chp").value = a.v_chp || "";
     document.getElementById("v_pi").value = a.v_pi || "";
     document.getElementById("v_l").value = a.v_l || "";
@@ -190,11 +182,13 @@ function chargerModeEdition() {
     document.getElementById("v_piro").value = a.v_piro || "";
     document.getElementById("v_toux").value = a.v_toux || "";
 
+    // Vaccins Chat
     document.getElementById("v_typhus").value = a.v_typhus || "";
     document.getElementById("v_coryza").value = a.v_coryza || "";
     document.getElementById("v_leucose").value = a.v_leucose || "";
     document.getElementById("v_rage_chat").value = a.v_rage_chat || "";
 
+    // Soins
     document.getElementById("s_toilettage").value = a.s_toilettage || "";
     document.getElementById("freq_toilettage").value = a.freq_toilettage || "3";
     document.getElementById("s_vermifuge").value = a.s_vermifuge || "";
@@ -216,6 +210,7 @@ document.getElementById("btnEnregistrer").onclick = function() {
         type: document.getElementById("typeInput").value,
         race: document.getElementById("raceInput").value.trim(),
         poids: document.getElementById("poidsInput").value,
+        identifiant: document.getElementById("identifiantInput").value.trim(),   // ← Nouveau champ
         dateNaissance: document.getElementById("dateNaissanceInput").value || 
                       (document.getElementById("anneeInput").value ? 
                        document.getElementById("anneeInput").value + "-01-01" : ""),
