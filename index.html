@@ -28,11 +28,31 @@
             <button class="onglet" data-type="rendezvous">📅 Rendez-vous</button>
         </div>
 
-        <!-- Bouton Ajouter -->
+        <!-- Bouton Ajouter un animal -->
         <button id="btnAjouter" class="btn-principal" style="margin: 20px 0;">+ Ajouter un animal</button>
 
         <!-- Liste des animaux -->
         <ul id="listeAnimaux"></ul>
+
+        <!-- Bloc Sauvegarde & Synchronisation -->
+        <div class="bloc-sauvegarde">
+            <h2>💾 Sauvegarde & Synchronisation</h2>
+            <p>Pour partager les données entre ton téléphone, ton ordinateur et celui de ta femme :</p>
+            
+            <div class="sauvegarde-boutons">
+                <button onclick="exporterDonnees()" class="btn-principal">
+                    💾 Exporter les données (Sauvegarde)
+                </button>
+                <button onclick="importerDonnees()" class="btn-secondaire">
+                    📂 Importer une sauvegarde
+                </button>
+            </div>
+            
+            <small style="display:block; margin-top:12px; color:#555;">
+                • Exporte un fichier que tu peux copier sur ton téléphone ou envoyer par WhatsApp/Email.<br>
+                • Chaque personne peut importer le même fichier pour avoir les mêmes données.
+            </small>
+        </div>
 
         <!-- Bloc Urgences -->
         <div id="blocUrgences">
