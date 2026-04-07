@@ -36,7 +36,7 @@ h3 {
     margin: 25px 0 15px 0;
 }
 
-/* Bannière Alertes */
+/* ====================== BANNER ALERTES ====================== */
 .banniere-alertes {
     background: linear-gradient(135deg, #fff3e0, #ffe0b2);
     border: 3px solid #f57c00;
@@ -79,7 +79,7 @@ h3 {
     transform: scale(1.2);
 }
 
-/* Onglets */
+/* ====================== ONGLET ====================== */
 .onglets {
     display: flex;
     gap: 10px;
@@ -102,7 +102,7 @@ h3 {
     color: white;
 }
 
-/* Liste animaux */
+/* ====================== LISTE ANIMAUX ====================== */
 #listeAnimaux {
     list-style: none;
 }
@@ -122,7 +122,7 @@ h3 {
     transform: translateX(8px);
 }
 
-/* Photo */
+/* ====================== PHOTO ====================== */
 .photoCarree {
     width: 100%;
     max-width: 240px;
@@ -149,7 +149,7 @@ h3 {
     }
 }
 
-/* Urgences */
+/* ====================== URGENCES ====================== */
 .phone-group {
     margin-bottom: 28px;
 }
@@ -213,7 +213,17 @@ h3 {
     color: #d45a80;
 }
 
-/* Notes */
+.numeroFixe a {
+    color: #d45a80;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.numeroFixe a:hover {
+    text-decoration: underline;
+}
+
+/* ====================== NOTES ====================== */
 .noteItem {
     background: #fff9fb;
     padding: 14px 18px;
@@ -240,7 +250,7 @@ h3 {
     background: #c0392b;
 }
 
-/* Rendez-vous */
+/* ====================== RENDEZ-VOUS ====================== */
 .rdv-item {
     background: white;
     padding: 16px;
@@ -250,7 +260,7 @@ h3 {
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-/* Bloc Sauvegarde */
+/* ====================== BLOC SAUVEGARDE ====================== */
 .bloc-sauvegarde {
     background: #f0f8ff;
     padding: 22px;
@@ -266,7 +276,7 @@ h3 {
     margin: 15px 0;
 }
 
-/* Boutons */
+/* ====================== BOUTONS ====================== */
 .btn-principal {
     background: #d45a80;
     color: white;
@@ -290,7 +300,7 @@ h3 {
     opacity: 0.9;
 }
 
-/* Cache & Modale */
+/* ====================== CACHE & MODALE ====================== */
 .cache {
     display: none !important;
 }
@@ -316,7 +326,7 @@ h3 {
     box-shadow: 0 15px 40px rgba(0,0,0,0.4);
 }
 
-/* Responsive */
+/* ====================== RESPONSIVE ====================== */
 @media (max-width: 650px) {
     .phone-row {
         flex-direction: column;
