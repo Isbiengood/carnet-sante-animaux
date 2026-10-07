@@ -6,6 +6,7 @@ let animaux = JSON.parse(localStorage.getItem("animaux")) || [];
 let photoBase64 = "";
 let notesTemporaires = [];
 let indexEdition = null;
+let rappelsVaccinsChienExistants = {};
 
 // Sauvegarde
 function sauvegarder() {
@@ -173,6 +174,11 @@ function chargerModeEdition() {
     notesTemporaires = a.notes ? [...a.notes] : [];
     afficherHistoriqueNotes(notesTemporaires);
 
+    // Réglages vaccins chien
+    document.getElementById("freq_vaccins_chien").value = String(a.freq_vaccins_chien || 36);
+    document.getElementById("delai_initial_vaccins_chien").value = "";
+    rappelsVaccinsChienExistants = { ...(a.rappelsVaccinsChien || {}) };
+
     // Vaccins Chien
     document.getElementById("v_chp").value = a.v_chp || "";
     document.getElementById("v_pi").value = a.v_pi || "";
@@ -218,6 +224,9 @@ document.getElementById("btnEnregistrer").onclick = function() {
         photo: photoBase64 || null,
         notes: notesTemporaires,
 
+        freq_vaccins_chien: parseInt(document.getElementById("freq_vaccins_chien").value) || 36,
+        rappelsVaccinsChien: { ...rappelsVaccinsChienExistants },
+
         v_chp: document.getElementById("v_chp").value,
         v_pi: document.getElementById("v_pi").value,
         v_l: document.getElementById("v_l").value,
@@ -236,6 +245,25 @@ document.getElementById("btnEnregistrer").onclick = function() {
         s_vermifuge: document.getElementById("s_vermifuge").value,
         s_antipuces: document.getElementById("s_antipuces").value
     };
+
+    // Délai exceptionnel avant le prochain rappel vaccinal du chien.
+    // Il ne s'applique qu'au prochain rappel ; après "Fait aujourd'hui",
+    // le rythme habituel (12 ou 36 mois) reprend automatiquement.
+    if (animal.type === "chien") {
+        const delaiInitial = parseInt(document.getElementById("delai_initial_vaccins_chien").value);
+        if ([1, 2, 3].includes(delaiInitial)) {
+            const dateRappel = new Date();
+            dateRappel.setHours(0, 0, 0, 0);
+            dateRappel.setFullYear(dateRappel.getFullYear() + delaiInitial);
+            const isoRappel = dateRappel.toISOString().split("T")[0];
+            const clesVaccinsChien = ["v_chp","v_pi","v_l","v_rage_chien","v_leish","v_piro","v_toux"];
+            clesVaccinsChien.forEach(key => {
+                if (animal[key]) animal.rappelsVaccinsChien[key] = isoRappel;
+            });
+        }
+    } else {
+        animal.rappelsVaccinsChien = {};
+    }
 
     if (indexEdition !== null) {
         animaux[indexEdition] = animal;
@@ -265,6 +293,12 @@ if (typeInput) {
 // ==================== INITIALISATION ====================
 window.onload = function() {
     chargerModeEdition();
+
+    // Nouvel animal : valeur par défaut compatible avec un cycle de 3 ans.
+    if (indexEdition === null) {
+        document.getElementById("freq_vaccins_chien").value = "36";
+        rappelsVaccinsChienExistants = {};
+    }
 
     if (typeInput) typeInput.dispatchEvent(new Event('change'));
 
