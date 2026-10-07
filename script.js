@@ -271,10 +271,13 @@ function exporterDonnees() {
     chargerDonnees();
     
     const donnees = {
-        version: "1.0",
+        version: "2.0",
         dateExport: new Date().toISOString(),
         animaux: animaux,
-        urgences: urgences
+        urgences: urgences,
+        rendezVous: JSON.parse(localStorage.getItem("rendezVous")) || [],
+        cloudKey: localStorage.getItem("carnetCloudKey") || null,
+        reminderEmail: localStorage.getItem("carnetReminderEmail") || null
     };
 
     const jsonString = JSON.stringify(donnees, null, 2);
@@ -316,6 +319,11 @@ function importerDonnees() {
                 if (donnees.urgences) {
                     (window.safeSetItem || localStorage.setItem.bind(localStorage))("urgences", JSON.stringify(donnees.urgences));
                 }
+                if (donnees.rendezVous) {
+                    (window.safeSetItem || localStorage.setItem.bind(localStorage))("rendezVous", JSON.stringify(donnees.rendezVous));
+                }
+                if (donnees.cloudKey) localStorage.setItem("carnetCloudKey", donnees.cloudKey);
+                if (donnees.reminderEmail) localStorage.setItem("carnetReminderEmail", donnees.reminderEmail);
 
                 alert("✅ Données restaurées avec succès !");
                 window.location.reload();
@@ -483,6 +491,7 @@ function retourAccueil() {
 // ==================== INITIALISATION ====================
 window.onload = async function () {
     if (window.safeStorageReady) await window.safeStorageReady;
+    if (window.cloudReady) await window.cloudReady;
     chargerDonnees();
 
     if (document.getElementById("ficheContent")) {
@@ -523,6 +532,26 @@ window.onload = async function () {
     }
 
     updatePhoneUI();
+
+    // Configuration email des rappels
+    const emailRappels = document.getElementById("emailRappels");
+    const btnEmailRappels = document.getElementById("btnEmailRappels");
+    const statutCloud = document.getElementById("statutCloud");
+    if (emailRappels) emailRappels.value = localStorage.getItem("carnetReminderEmail") || "";
+    if (btnEmailRappels) {
+        btnEmailRappels.onclick = async () => {
+            try {
+                btnEmailRappels.disabled = true;
+                await window.configurerEmailRappels(emailRappels.value);
+                if (statutCloud) statutCloud.textContent = "✅ Email enregistré • sauvegarde cloud active";
+                alert("Adresse email enregistrée pour les rappels.");
+            } catch (err) {
+                alert("Impossible d'enregistrer l'adresse email : " + err.message);
+            } finally {
+                btnEmailRappels.disabled = false;
+            }
+        };
+    }
 
     // Onglets
     document.querySelectorAll(".onglet").forEach(btn => {
