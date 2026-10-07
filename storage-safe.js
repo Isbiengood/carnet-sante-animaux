@@ -43,6 +43,7 @@
     localStorage.setItem(key, value);
     if (KEYS.includes(key)) {
       ecrireSecours(key, value).catch(err => console.warn("Sauvegarde IndexedDB impossible", err));
+      window.dispatchEvent(new CustomEvent("carnet:data-changed", { detail: { key } }));
     }
   };
 
