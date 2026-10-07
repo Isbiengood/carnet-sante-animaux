@@ -73,10 +73,15 @@ function getRappelVaccinChien(animal, key) {
     return animal && animal.rappelsVaccinsChien ? animal.rappelsVaccinsChien[key] || "" : "";
 }
 
+function getRappelVaccinChat(animal, key) {
+    return animal && animal.rappelsVaccinsChat ? animal.rappelsVaccinsChat[key] || "" : "";
+}
+
 // ==================== FRÉQUENCES ====================
 function getFrequenceVaccin(animal, vaccin) {
     let age = calculAge(animal.dateNaissance);
     if (animal.type === "chat") {
+        if (animal.freq_vaccins_chat) return parseInt(animal.freq_vaccins_chat);
         if (age > 3) return vaccin === "rage" ? 36 : (animal.exterieur ? 12 : 36);
         return 12;
     }
@@ -127,10 +132,10 @@ function verifierAlertesProchaines() {
             {label:"Piroplasmose", key:"v_piro", freq:getFrequenceVaccin(animal,"piroplasmose"), rappel:getRappelVaccinChien(animal,"v_piro")},
             {label:"Toux du chenil", key:"v_toux", freq:getFrequenceVaccin(animal,"toux"), rappel:getRappelVaccinChien(animal,"v_toux")}
         ] : [
-            {label:"Typhus", key:"v_typhus", freq:getFrequenceVaccin(animal,"typhus")},
-            {label:"Coryza", key:"v_coryza", freq:getFrequenceVaccin(animal,"coryza")},
-            {label:"Leucose", key:"v_leucose", freq:getFrequenceVaccin(animal,"leucose")},
-            {label:"Rage", key:"v_rage_chat", freq:getFrequenceVaccin(animal,"rage")}
+            {label:"Typhus", key:"v_typhus", freq:getFrequenceVaccin(animal,"typhus"), rappel:getRappelVaccinChat(animal,"v_typhus")},
+            {label:"Coryza", key:"v_coryza", freq:getFrequenceVaccin(animal,"coryza"), rappel:getRappelVaccinChat(animal,"v_coryza")},
+            {label:"Leucose", key:"v_leucose", freq:getFrequenceVaccin(animal,"leucose"), rappel:getRappelVaccinChat(animal,"v_leucose")},
+            {label:"Rage", key:"v_rage_chat", freq:getFrequenceVaccin(animal,"rage"), rappel:getRappelVaccinChat(animal,"v_rage_chat")}
         ];
 
         alertes = alertes.concat(collecterAlertesAnimal(animal, index, vaccins));
@@ -199,6 +204,9 @@ window.marquerFaitDepuisBanniere = function(index, key) {
     if (animaux[index].rappelsVaccinsChien && animaux[index].rappelsVaccinsChien[key]) {
         delete animaux[index].rappelsVaccinsChien[key];
     }
+    if (animaux[index].rappelsVaccinsChat && animaux[index].rappelsVaccinsChat[key]) {
+        delete animaux[index].rappelsVaccinsChat[key];
+    }
     sauvegarder();
     verifierAlertesProchaines();
 };
@@ -208,6 +216,9 @@ window.majAujourdHui = function(index, key) {
     animaux[index][key] = today;
     if (animaux[index].rappelsVaccinsChien && animaux[index].rappelsVaccinsChien[key]) {
         delete animaux[index].rappelsVaccinsChien[key];
+    }
+    if (animaux[index].rappelsVaccinsChat && animaux[index].rappelsVaccinsChat[key]) {
+        delete animaux[index].rappelsVaccinsChat[key];
     }
     sauvegarder();
     verifierAlertesProchaines();
@@ -395,10 +406,12 @@ function chargerFiche() {
         html += blocDate("Piroplasmose", a.v_piro, getFrequenceVaccin(a, "piroplasmose"), "v_piro", index, getRappelVaccinChien(a, "v_piro"));
         html += blocDate("Toux du chenil", a.v_toux, getFrequenceVaccin(a, "toux"), "v_toux", index, getRappelVaccinChien(a, "v_toux"));
     } else {
-        html += blocDate("Typhus", a.v_typhus, getFrequenceVaccin(a, "typhus"), "v_typhus", index);
-        html += blocDate("Coryza", a.v_coryza, getFrequenceVaccin(a, "coryza"), "v_coryza", index);
-        html += blocDate("Leucose", a.v_leucose, getFrequenceVaccin(a, "leucose"), "v_leucose", index);
-        html += blocDate("Rage", a.v_rage_chat, getFrequenceVaccin(a, "rage"), "v_rage_chat", index);
+        const rythmeChat = a.freq_vaccins_chat ? ((parseInt(a.freq_vaccins_chat) === 12) ? "tous les 1 an" : "tous les 3 ans") : "automatique selon âge / accès extérieur";
+        html += `<p class="info"><strong>Rythme habituel choisi :</strong> ${rythmeChat}.</p>`;
+        html += blocDate("Typhus", a.v_typhus, getFrequenceVaccin(a, "typhus"), "v_typhus", index, getRappelVaccinChat(a, "v_typhus"));
+        html += blocDate("Coryza", a.v_coryza, getFrequenceVaccin(a, "coryza"), "v_coryza", index, getRappelVaccinChat(a, "v_coryza"));
+        html += blocDate("Leucose", a.v_leucose, getFrequenceVaccin(a, "leucose"), "v_leucose", index, getRappelVaccinChat(a, "v_leucose"));
+        html += blocDate("Rage", a.v_rage_chat, getFrequenceVaccin(a, "rage"), "v_rage_chat", index, getRappelVaccinChat(a, "v_rage_chat"));
     }
 
     html += `
