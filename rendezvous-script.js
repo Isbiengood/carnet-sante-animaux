@@ -5,7 +5,7 @@
 let rendezVous = JSON.parse(localStorage.getItem("rendezVous")) || [];
 
 function sauvegarderRdv() {
-    localStorage.setItem("rendezVous", JSON.stringify(rendezVous));
+    (window.safeSetItem || localStorage.setItem.bind(localStorage))("rendezVous", JSON.stringify(rendezVous));
 }
 
 function formatDateHeure(dateStr, heureStr) {
@@ -98,6 +98,8 @@ function retourAccueil() {
 }
 
 // ==================== INITIALISATION ====================
-window.onload = function() {
+window.onload = async function() {
+    if (window.safeStorageReady) await window.safeStorageReady;
+    rendezVous = JSON.parse(localStorage.getItem("rendezVous")) || [];
     afficherListeRendezVous();
 };
