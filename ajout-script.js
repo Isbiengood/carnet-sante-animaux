@@ -314,6 +314,7 @@ if (typeInput) {
 // ==================== INITIALISATION ====================
 window.onload = async function() {
     if (window.safeStorageReady) await window.safeStorageReady;
+    if (window.cloudReady) await window.cloudReady;
     animaux = JSON.parse(localStorage.getItem("animaux")) || [];
     chargerModeEdition();
 
