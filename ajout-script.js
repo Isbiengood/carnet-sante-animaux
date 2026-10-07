@@ -7,6 +7,7 @@ let photoBase64 = "";
 let notesTemporaires = [];
 let indexEdition = null;
 let rappelsVaccinsChienExistants = {};
+let rappelsVaccinsChatExistants = {};
 
 // Sauvegarde
 function sauvegarder() {
@@ -188,6 +189,11 @@ function chargerModeEdition() {
     document.getElementById("v_piro").value = a.v_piro || "";
     document.getElementById("v_toux").value = a.v_toux || "";
 
+    // Réglages vaccins chat
+    document.getElementById("freq_vaccins_chat").value = a.freq_vaccins_chat ? String(a.freq_vaccins_chat) : "";
+    document.getElementById("delai_initial_vaccins_chat").value = "";
+    rappelsVaccinsChatExistants = { ...(a.rappelsVaccinsChat || {}) };
+
     // Vaccins Chat
     document.getElementById("v_typhus").value = a.v_typhus || "";
     document.getElementById("v_coryza").value = a.v_coryza || "";
@@ -235,6 +241,9 @@ document.getElementById("btnEnregistrer").onclick = function() {
         v_piro: document.getElementById("v_piro").value,
         v_toux: document.getElementById("v_toux").value,
 
+        freq_vaccins_chat: document.getElementById("freq_vaccins_chat").value ? parseInt(document.getElementById("freq_vaccins_chat").value) : null,
+        rappelsVaccinsChat: { ...rappelsVaccinsChatExistants },
+
         v_typhus: document.getElementById("v_typhus").value,
         v_coryza: document.getElementById("v_coryza").value,
         v_leucose: document.getElementById("v_leucose").value,
@@ -261,7 +270,19 @@ document.getElementById("btnEnregistrer").onclick = function() {
                 if (animal[key]) animal.rappelsVaccinsChien[key] = isoRappel;
             });
         }
-    } else {
+        animal.rappelsVaccinsChat = {};
+    } else if (animal.type === "chat") {
+        const delaiInitialChat = parseInt(document.getElementById("delai_initial_vaccins_chat").value);
+        if ([1, 2, 3].includes(delaiInitialChat)) {
+            const dateRappelChat = new Date();
+            dateRappelChat.setHours(0, 0, 0, 0);
+            dateRappelChat.setFullYear(dateRappelChat.getFullYear() + delaiInitialChat);
+            const isoRappelChat = dateRappelChat.toISOString().split("T")[0];
+            const clesVaccinsChat = ["v_typhus","v_coryza","v_leucose","v_rage_chat"];
+            clesVaccinsChat.forEach(key => {
+                if (animal[key]) animal.rappelsVaccinsChat[key] = isoRappelChat;
+            });
+        }
         animal.rappelsVaccinsChien = {};
     }
 
@@ -297,7 +318,9 @@ window.onload = function() {
     // Nouvel animal : valeur par défaut compatible avec un cycle de 3 ans.
     if (indexEdition === null) {
         document.getElementById("freq_vaccins_chien").value = "36";
+        document.getElementById("freq_vaccins_chat").value = "";
         rappelsVaccinsChienExistants = {};
+        rappelsVaccinsChatExistants = {};
     }
 
     if (typeInput) typeInput.dispatchEvent(new Event('change'));
