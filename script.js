@@ -13,8 +13,8 @@ function chargerDonnees() {
 }
 
 function sauvegarder() {
-    localStorage.setItem("animaux", JSON.stringify(animaux));
-    localStorage.setItem("urgences", JSON.stringify(urgences));
+    (window.safeSetItem || localStorage.setItem.bind(localStorage))("animaux", JSON.stringify(animaux));
+    (window.safeSetItem || localStorage.setItem.bind(localStorage))("urgences", JSON.stringify(urgences));
 }
 
 // ==================== OUTILS DATES ====================
@@ -311,10 +311,10 @@ function importerDonnees() {
                 const donnees = JSON.parse(event.target.result);
 
                 if (donnees.animaux) {
-                    localStorage.setItem("animaux", JSON.stringify(donnees.animaux));
+                    (window.safeSetItem || localStorage.setItem.bind(localStorage))("animaux", JSON.stringify(donnees.animaux));
                 }
                 if (donnees.urgences) {
-                    localStorage.setItem("urgences", JSON.stringify(donnees.urgences));
+                    (window.safeSetItem || localStorage.setItem.bind(localStorage))("urgences", JSON.stringify(donnees.urgences));
                 }
 
                 alert("✅ Données restaurées avec succès !");
@@ -481,7 +481,8 @@ function retourAccueil() {
 }
 
 // ==================== INITIALISATION ====================
-window.onload = function () {
+window.onload = async function () {
+    if (window.safeStorageReady) await window.safeStorageReady;
     chargerDonnees();
 
     if (document.getElementById("ficheContent")) {
