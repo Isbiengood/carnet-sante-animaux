@@ -52,6 +52,27 @@ function analyser(date, freq) {
     };
 }
 
+function analyserAvecRappel(date, freq, rappelDirect) {
+    if (rappelDirect) {
+        let today = new Date(); today.setHours(0,0,0,0);
+        let prochaine = new Date(rappelDirect);
+        if (!isNaN(prochaine.getTime())) {
+            prochaine.setHours(0,0,0,0);
+            let diffDays = Math.ceil((prochaine.getTime() - today.getTime()) / 86400000);
+            return {
+                prochaine,
+                diff: diffDays > 0 ? diffDays : 0,
+                retard: diffDays < 0 ? Math.abs(diffDays) : 0
+            };
+        }
+    }
+    return analyser(date, freq);
+}
+
+function getRappelVaccinChien(animal, key) {
+    return animal && animal.rappelsVaccinsChien ? animal.rappelsVaccinsChien[key] || "" : "";
+}
+
 // ==================== FRÉQUENCES ====================
 function getFrequenceVaccin(animal, vaccin) {
     let age = calculAge(animal.dateNaissance);
@@ -60,8 +81,7 @@ function getFrequenceVaccin(animal, vaccin) {
         return 12;
     }
     if (animal.type === "chien") {
-        if (age > 1) return vaccin === "rage" ? 36 : 12;
-        return 12;
+        return parseInt(animal.freq_vaccins_chien) || 36;
     }
     return 12;
 }
@@ -74,9 +94,9 @@ function getFrequenceSoin(animal, soin) {
 }
 
 // ==================== BLOC DATE ====================
-function blocDate(label, date, freq, key, index) {
-    if (!date) return `<p>${label} : Non renseigné</p>`;
-    let analyse = analyser(date, freq);
+function blocDate(label, date, freq, key, index, rappelDirect = "") {
+    if (!date && !rappelDirect) return `<p>${label} : Non renseigné</p>`;
+    let analyse = analyserAvecRappel(date, freq, rappelDirect);
     if (!analyse) return `<p>${label} : Non renseigné</p>`;
 
     let txt = `${label} : ${formatDateFR(analyse.prochaine)}`;
@@ -99,13 +119,13 @@ function verifierAlertesProchaines() {
     animaux.forEach((animal, index) => {
         const estChien = animal.type === "chien";
         const vaccins = estChien ? [
-            {label:"CHP", key:"v_chp", freq:12},
-            {label:"Parvovirose (Pi)", key:"v_pi", freq:12},
-            {label:"Leptospirose", key:"v_l", freq:12},
-            {label:"Rage", key:"v_rage_chien", freq:getFrequenceVaccin(animal,"rage")},
-            {label:"Leishmaniose", key:"v_leish", freq:12},
-            {label:"Piroplasmose", key:"v_piro", freq:12},
-            {label:"Toux du chenil", key:"v_toux", freq:12}
+            {label:"CHP", key:"v_chp", freq:getFrequenceVaccin(animal,"chp"), rappel:getRappelVaccinChien(animal,"v_chp")},
+            {label:"Parvovirose (Pi)", key:"v_pi", freq:getFrequenceVaccin(animal,"pi"), rappel:getRappelVaccinChien(animal,"v_pi")},
+            {label:"Leptospirose", key:"v_l", freq:getFrequenceVaccin(animal,"leptospirose"), rappel:getRappelVaccinChien(animal,"v_l")},
+            {label:"Rage", key:"v_rage_chien", freq:getFrequenceVaccin(animal,"rage"), rappel:getRappelVaccinChien(animal,"v_rage_chien")},
+            {label:"Leishmaniose", key:"v_leish", freq:getFrequenceVaccin(animal,"leishmaniose"), rappel:getRappelVaccinChien(animal,"v_leish")},
+            {label:"Piroplasmose", key:"v_piro", freq:getFrequenceVaccin(animal,"piroplasmose"), rappel:getRappelVaccinChien(animal,"v_piro")},
+            {label:"Toux du chenil", key:"v_toux", freq:getFrequenceVaccin(animal,"toux"), rappel:getRappelVaccinChien(animal,"v_toux")}
         ] : [
             {label:"Typhus", key:"v_typhus", freq:getFrequenceVaccin(animal,"typhus")},
             {label:"Coryza", key:"v_coryza", freq:getFrequenceVaccin(animal,"coryza")},
@@ -143,8 +163,8 @@ function verifierAlertesProchaines() {
 function collecterAlertesAnimal(animal, indexAnimal, items) {
     let alertesAnimal = [];
     items.forEach(item => {
-        if (!animal[item.key]) return;
-        let analyse = analyser(animal[item.key], item.freq);
+        if (!animal[item.key] && !item.rappel) return;
+        let analyse = analyserAvecRappel(animal[item.key], item.freq, item.rappel || "");
         if (!analyse) return;
         if (analyse.retard > 0 || (analyse.diff > 0 && analyse.diff <= 5)) {
             let statut = analyse.retard > 0 ? `🔴 EN RETARD (${analyse.retard}j)` : `🟡 Dans ${analyse.diff} jour${analyse.diff>1?'s':''}`;
@@ -176,6 +196,9 @@ function afficherDetailsAlertes(alertes) {
 window.marquerFaitDepuisBanniere = function(index, key) {
     let today = new Date().toISOString().split("T")[0];
     animaux[index][key] = today;
+    if (animaux[index].rappelsVaccinsChien && animaux[index].rappelsVaccinsChien[key]) {
+        delete animaux[index].rappelsVaccinsChien[key];
+    }
     sauvegarder();
     verifierAlertesProchaines();
 };
@@ -183,6 +206,9 @@ window.marquerFaitDepuisBanniere = function(index, key) {
 window.majAujourdHui = function(index, key) {
     let today = new Date().toISOString().split("T")[0];
     animaux[index][key] = today;
+    if (animaux[index].rappelsVaccinsChien && animaux[index].rappelsVaccinsChien[key]) {
+        delete animaux[index].rappelsVaccinsChien[key];
+    }
     sauvegarder();
     verifierAlertesProchaines();
 
@@ -360,13 +386,14 @@ function chargerFiche() {
         <h3>Vaccins</h3>`;
 
     if (a.type === "chien") {
-        html += blocDate("CHP", a.v_chp, 12, "v_chp", index);
-        html += blocDate("Parvovirose (Pi)", a.v_pi, 12, "v_pi", index);
-        html += blocDate("Leptospirose", a.v_l, 12, "v_l", index);
-        html += blocDate("Rage", a.v_rage_chien, getFrequenceVaccin(a, "rage"), "v_rage_chien", index);
-        html += blocDate("Leishmaniose", a.v_leish, 12, "v_leish", index);
-        html += blocDate("Piroplasmose", a.v_piro, 12, "v_piro", index);
-        html += blocDate("Toux du chenil", a.v_toux, 12, "v_toux", index);
+        html += `<p class="info"><strong>Rythme habituel choisi :</strong> tous les ${(parseInt(a.freq_vaccins_chien) || 36) === 12 ? "1 an" : "3 ans"}.</p>`;
+        html += blocDate("CHP", a.v_chp, getFrequenceVaccin(a, "chp"), "v_chp", index, getRappelVaccinChien(a, "v_chp"));
+        html += blocDate("Parvovirose (Pi)", a.v_pi, getFrequenceVaccin(a, "pi"), "v_pi", index, getRappelVaccinChien(a, "v_pi"));
+        html += blocDate("Leptospirose", a.v_l, getFrequenceVaccin(a, "leptospirose"), "v_l", index, getRappelVaccinChien(a, "v_l"));
+        html += blocDate("Rage", a.v_rage_chien, getFrequenceVaccin(a, "rage"), "v_rage_chien", index, getRappelVaccinChien(a, "v_rage_chien"));
+        html += blocDate("Leishmaniose", a.v_leish, getFrequenceVaccin(a, "leishmaniose"), "v_leish", index, getRappelVaccinChien(a, "v_leish"));
+        html += blocDate("Piroplasmose", a.v_piro, getFrequenceVaccin(a, "piroplasmose"), "v_piro", index, getRappelVaccinChien(a, "v_piro"));
+        html += blocDate("Toux du chenil", a.v_toux, getFrequenceVaccin(a, "toux"), "v_toux", index, getRappelVaccinChien(a, "v_toux"));
     } else {
         html += blocDate("Typhus", a.v_typhus, getFrequenceVaccin(a, "typhus"), "v_typhus", index);
         html += blocDate("Coryza", a.v_coryza, getFrequenceVaccin(a, "coryza"), "v_coryza", index);
