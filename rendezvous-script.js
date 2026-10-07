@@ -100,6 +100,7 @@ function retourAccueil() {
 // ==================== INITIALISATION ====================
 window.onload = async function() {
     if (window.safeStorageReady) await window.safeStorageReady;
+    if (window.cloudReady) await window.cloudReady;
     rendezVous = JSON.parse(localStorage.getItem("rendezVous")) || [];
     afficherListeRendezVous();
 };
