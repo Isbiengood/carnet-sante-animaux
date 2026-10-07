@@ -11,7 +11,7 @@ let rappelsVaccinsChatExistants = {};
 
 // Sauvegarde
 function sauvegarder() {
-    localStorage.setItem("animaux", JSON.stringify(animaux));
+    (window.safeSetItem || localStorage.setItem.bind(localStorage))("animaux", JSON.stringify(animaux));
 }
 
 // ==================== OUTILS DATES ====================
@@ -312,7 +312,9 @@ if (typeInput) {
 }
 
 // ==================== INITIALISATION ====================
-window.onload = function() {
+window.onload = async function() {
+    if (window.safeStorageReady) await window.safeStorageReady;
+    animaux = JSON.parse(localStorage.getItem("animaux")) || [];
     chargerModeEdition();
 
     // Nouvel animal : valeur par défaut compatible avec un cycle de 3 ans.
