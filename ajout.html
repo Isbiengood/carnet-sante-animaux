@@ -99,6 +99,25 @@
     </div>
 
     <div id="vaccinsChat" class="form-bloc cache">
+        <div class="form-bloc" style="background:#f7f7f7; padding:12px; margin-bottom:18px;">
+            <strong>Réglage des rappels vaccinaux du chat</strong>
+
+            <label>Fréquence habituelle des rappels :</label>
+            <select id="freq_vaccins_chat">
+                <option value="">Automatique selon âge / accès extérieur</option>
+                <option value="12">Tous les ans</option>
+                <option value="36">Tous les 3 ans</option>
+            </select>
+
+            <label>À l’enregistrement, prochain rappel dans :</label>
+            <select id="delai_initial_vaccins_chat">
+                <option value="">Calculer depuis la date du dernier vaccin</option>
+                <option value="1">1 an</option>
+                <option value="2">2 ans</option>
+                <option value="3">3 ans</option>
+            </select>
+            <p class="info">Si le chat est déjà dans un cycle de 3 ans commencé depuis 1 an, choisissez « 2 ans ». Après ce rappel, le logiciel reprend la fréquence habituelle ou le calcul automatique.</p>
+        </div>
         <label>Typhus :</label>
         <input type="date" id="v_typhus">
 
