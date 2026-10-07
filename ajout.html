@@ -57,6 +57,24 @@
     <!-- Vaccins -->
     <h3>Vaccins</h3>
     <div id="vaccinsChien" class="form-bloc">
+        <div class="form-bloc" style="background:#f7f7f7; padding:12px; margin-bottom:18px;">
+            <strong>Réglage des rappels vaccinaux du chien</strong>
+
+            <label>Fréquence habituelle des rappels :</label>
+            <select id="freq_vaccins_chien">
+                <option value="12">Tous les ans</option>
+                <option value="36" selected>Tous les 3 ans</option>
+            </select>
+
+            <label>À l’enregistrement, prochain rappel dans :</label>
+            <select id="delai_initial_vaccins_chien">
+                <option value="">Calculer depuis la date du dernier vaccin</option>
+                <option value="1">1 an</option>
+                <option value="2">2 ans</option>
+                <option value="3">3 ans</option>
+            </select>
+            <p class="info">Exemple : si le vaccin a déjà été fait il y a 1 an dans un cycle de 3 ans, choisissez « 2 ans ». Après ce prochain rappel, le rythme habituel choisi ci-dessus sera repris automatiquement.</p>
+        </div>
         <label>CHP :</label>
         <input type="date" id="v_chp">
 
